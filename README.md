@@ -4,7 +4,7 @@
 
 ```bash
 cd /agent/luoxue-movie
-DISPLAY=:1 npm run dev
+npm run dev
 ```
 
-本机需要可用的图形界面和 Google Chrome。开发服务默认在 http://localhost:3000 。
+开发服务默认在 http://localhost:3000 。片源由服务端直接请求，不需要浏览器。

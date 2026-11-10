@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   devIndicators: false,
   allowedDevOrigins: ["127.0.0.1"],
-  serverExternalPackages: ["puppeteer-core", "cheerio"],
+  serverExternalPackages: ["cheerio"],
   partialPrefetching: true,
   turbopack: {
     rules: {

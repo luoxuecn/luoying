@@ -1,11 +1,8 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { ApiError, asApiError, upstream } from "./errors";
 
 const ORIGIN = "https://dsystv.com";
-const CACHE_MS = 45_000;
-const USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36 Edg/156.0.0.0";
+export const UPSTREAM_UA =
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
 
 interface CacheEntry {
   at: number;
@@ -13,7 +10,6 @@ interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>();
-let cookieCache = "";
 
 function allowedPath(url: URL) {
   return (
@@ -31,19 +27,49 @@ function isChallenge(html: string) {
   return !html || html.includes("Just a moment") || html.includes("Performing security verification") || html.includes("cf-browser-verification");
 }
 
-function sessionCookie() {
-  const fromEnv = process.env.DSYS_COOKIE?.trim();
-  if (fromEnv) return fromEnv;
-  if (cookieCache) return cookieCache;
-  try {
-    const text = readFileSync(resolve(process.cwd(), ".env.local"), "utf8");
-    const line = text.split("\n").find((item) => item.startsWith("DSYS_COOKIE="));
-    const value = line?.slice("DSYS_COOKIE=".length).trim().replace(/^['"]|['"]$/g, "") || "";
-    if (value) cookieCache = value;
-    return value;
-  } catch {
-    return "";
+function cacheTtl(path: string, method: string) {
+  if (path.startsWith("/play/")) return 0;
+  if (method === "POST") return 600_000;
+  if (path.startsWith("/movie/")) return 1_800_000;
+  return 900_000;
+}
+
+function refererFor(url: URL, method: string) {
+  if (url.pathname.startsWith("/play/")) return url.toString();
+  if (method === "POST") return `${ORIGIN}/search.php`;
+  return `${ORIGIN}/`;
+}
+
+async function requestText(url: URL, method: "GET" | "POST", body?: string) {
+  let current = url;
+  const referer = refererFor(url, method);
+  for (let redirectCount = 0; redirectCount <= 5; redirectCount += 1) {
+    const response = await fetch(current, {
+      method,
+      headers: {
+        "User-Agent": UPSTREAM_UA,
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        Referer: referer,
+        ...(method === "POST" ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+      },
+      body: method === "POST" ? body : undefined,
+      redirect: "manual",
+      signal: AbortSignal.timeout(20_000),
+      cache: "no-store",
+    });
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get("location");
+      if (!location || redirectCount === 5) throw upstream();
+      const next = new URL(location, current);
+      if (next.origin !== ORIGIN || !allowedPath(next)) throw upstream();
+      current = next;
+      continue;
+    }
+    const text = await response.text();
+    if (response.status !== 200 || isChallenge(text)) throw upstream();
+    return text;
   }
+  throw upstream();
 }
 
 export async function upstreamText(path: string, init?: { method?: "GET" | "POST"; body?: string }) {
@@ -51,32 +77,12 @@ export async function upstreamText(path: string, init?: { method?: "GET" | "POST
   if (url.origin !== ORIGIN || !allowedPath(url)) throw upstream();
   const method = init?.method || "GET";
   const key = `${method} ${url.toString()} ${init?.body || ""}`;
+  const ttl = cacheTtl(url.pathname, method);
   const hit = cache.get(key);
-  if (method === "GET" && hit && Date.now() - hit.at < CACHE_MS && !path.startsWith("/play/")) {
-    return hit.text;
-  }
-  const cookie = sessionCookie();
-  if (!cookie) throw upstream();
+  if (ttl > 0 && hit && Date.now() - hit.at < ttl) return hit.text;
   try {
-    const response = await fetch(url, {
-      method,
-      headers: {
-        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
-        "cache-control": "max-age=0",
-        cookie,
-        referer: ORIGIN + "/",
-        "upgrade-insecure-requests": "1",
-        "user-agent": USER_AGENT,
-        ...(method === "POST" ? { "content-type": "application/x-www-form-urlencoded" } : {}),
-      },
-      body: method === "POST" ? init?.body : undefined,
-      signal: AbortSignal.timeout(18_000),
-      cache: "no-store",
-    });
-    const text = await response.text();
-    if (response.status !== 200 || isChallenge(text)) throw upstream();
-    if (method === "GET" && !path.startsWith("/play/")) cache.set(key, { at: Date.now(), text });
+    const text = await requestText(url, method, init?.body);
+    if (ttl > 0) cache.set(key, { at: Date.now(), text });
     return text;
   } catch (error) {
     if (error instanceof ApiError) throw error;
