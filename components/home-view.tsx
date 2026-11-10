@@ -14,16 +14,18 @@ interface HomeData {
   sections: { title: string; todayCount?: number; more?: { typeId?: string; tid?: string; order?: string; target?: string }; list: Card[] }[];
 }
 
+const showHomeBanner = false;
+
 export function HomeView() {
   const { status, data, error, retry } = useApi<HomeData>("/api/home");
-  if (status === "loading") return <LoadingBlock kind="home" />;
+  if (status === "loading") return <LoadingBlock kind={showHomeBanner ? "home" : "grid"} />;
   if (status === "error") return <Status title="首页暂时打不开" detail={error.message} retry={error.retryable ? retry : undefined} />;
   const sections = data.sections.filter((section) => !section.title.includes("最近更新") && section.more?.target !== "latest");
-  const hasCards = data.banner.length > 0 || sections.some((section) => section.list.length > 0);
+  const hasCards = (showHomeBanner && data.banner.length > 0) || sections.some((section) => section.list.length > 0);
   if (!hasCards) return <Status title="暂时没有影片" />;
   return (
     <div>
-      {data.banner.length ? <Banner items={data.banner} /> : null}
+      {showHomeBanner && data.banner.length ? <Banner items={data.banner} /> : null}
       {sections.map((section) => (
         <section className="section" key={section.title}>
           <div className="section-head">

@@ -196,7 +196,7 @@ img { display: block; max-width: 100%; }
 .search button:hover { color: var(--text); }
 
 .page { padding: 24px 0 48px; flex: 1; }
-.page:has(.player-frame) { padding-top: 0; }
+html[data-play="true"] .page { padding-top: 0; }
 
 .page-head {
   display: flex;
@@ -587,7 +587,7 @@ img { display: block; max-width: 100%; }
   background: #07090d;
 }
 @media (min-width: 1101px) {
-  .page:has(.player-frame) { width: 100%; max-width: none; }
+  html[data-play="true"] .page { width: 100%; max-width: none; }
   .play-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 380px;
