@@ -208,18 +208,17 @@ function episodeIndex(playId: string) {
 }
 
 function matchingEpisode(from: Episode[], to: Episode[], playId: string) {
+  if (!to.length) return undefined;
   const current = from.find((episode) => episode.playId === playId);
-  if (!current) return to[0]?.playId;
+  const last = to[to.length - 1].playId;
+  if (!current) return last;
   const key = episodeIndex(current.playId);
   if (key != null) {
     const found = to.find((episode) => episodeIndex(episode.playId) === key);
     if (found) return found.playId;
   }
   const named = to.find((episode) => episode.name === current.name);
-  if (named) return named.playId;
-  const index = from.findIndex((episode) => episode.playId === playId);
-  if (index >= 0 && to.length) return to[Math.min(index, to.length - 1)].playId;
-  return to[0]?.playId;
+  return named ? named.playId : last;
 }
 
 function pageFor(episodes: Episode[], playId: string, reversed: boolean) {
