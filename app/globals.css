@@ -422,7 +422,7 @@ html[data-play="true"] .page { padding-top: 0; }
   aspect-ratio: 2 / 3;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--soft) url("/cover.svg") center / cover no-repeat;
+  background: #141820 url("/cover.jpg") center / cover no-repeat;
 }
 .poster img { width: 100%; height: 100%; object-fit: cover; }
 .badge {
