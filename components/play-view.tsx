@@ -202,6 +202,26 @@ function textUnits(text: string) {
 
 const EPISODE_PAGE = 30;
 
+function episodeIndex(playId: string) {
+  const match = playId.match(/^ep_\d+_\d+_(\d+)$/);
+  return match ? Number(match[1]) : null;
+}
+
+function matchingEpisode(from: Episode[], to: Episode[], playId: string) {
+  const current = from.find((episode) => episode.playId === playId);
+  if (!current) return to[0]?.playId;
+  const key = episodeIndex(current.playId);
+  if (key != null) {
+    const found = to.find((episode) => episodeIndex(episode.playId) === key);
+    if (found) return found.playId;
+  }
+  const named = to.find((episode) => episode.name === current.name);
+  if (named) return named.playId;
+  const index = from.findIndex((episode) => episode.playId === playId);
+  if (index >= 0 && to.length) return to[Math.min(index, to.length - 1)].playId;
+  return to[0]?.playId;
+}
+
 function pageFor(episodes: Episode[], playId: string, reversed: boolean) {
   const index = episodes.findIndex((episode) => episode.playId === playId);
   const ordered = index < 0 ? 0 : reversed ? episodes.length - 1 - index : index;
@@ -235,7 +255,7 @@ function EpisodePicker({ sources, playId, onOpen }: { sources: Source[]; playId:
       <div className="section-head">
         <h2>播放线路</h2>
       </div>
-      <LineRow sources={sources} active={active.name} onOpen={onOpen} />
+      <LineRow sources={sources} active={active} playId={playId} onOpen={onOpen} />
       <div className="section-head episode-head">
         <h2>选集</h2>
         <div className="episode-tools">
@@ -331,7 +351,7 @@ function lineRank(measure: LineMeasure | "pending" | undefined, best: boolean) {
   return 3;
 }
 
-function LineRow({ sources, active, onOpen }: { sources: Source[]; active: string; onOpen: (playId: string) => void }) {
+function LineRow({ sources, active, playId, onOpen }: { sources: Source[]; active: Source; playId: string; onOpen: (playId: string) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ left: false, right: false, hint: false });
   const [speeds, setSpeeds] = useState<Record<string, LineMeasure | "pending">>({});
@@ -410,11 +430,12 @@ function LineRow({ sources, active, onOpen }: { sources: Source[]; active: strin
           const speed = lineLabel(speeds[source.name], source.name === bestName);
           return (
             <button
-              className={source.name === active ? "line-chip active" : "line-chip"}
+              className={source.name === active.name ? "line-chip active" : "line-chip"}
               type="button"
               key={source.name}
               onClick={() => {
-                const next = source.episodes[0]?.playId;
+                if (source.name === active.name) return;
+                const next = matchingEpisode(active.episodes, source.episodes, playId);
                 if (next) onOpen(next);
               }}
             >
