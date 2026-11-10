@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
+import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
@@ -20,6 +21,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="zh-CN">
       <body>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <div className="site">
           <Suspense fallback={<div className="header" />}>
             <SiteHeader />

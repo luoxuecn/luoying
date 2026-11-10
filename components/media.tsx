@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { beginNavigation } from "./navigation-progress";
 import { useState, type FormEvent } from "react";
 import type { Card } from "@/lib/parse";
 import { IconChevronLeft, IconChevronRight, IconEnter, IconRefresh } from "./icons";
@@ -27,6 +28,11 @@ export function Status({
       ) : null}
     </div>
   );
+}
+
+export function PageFailure({ title, detail, retryable }: { title: string; detail?: string; retryable?: boolean }) {
+  const router = useRouter();
+  return <Status title={title} detail={detail} retry={retryable ? () => router.refresh() : undefined} />;
 }
 
 export function LoadingBlock({ kind = "grid" }: { kind?: "grid" | "home" | "rows" }) {
@@ -85,10 +91,6 @@ export function PosterFace({ card }: { card: Pick<Card, "vod_name" | "vod_pic" |
   );
 }
 
-export function cardMeta(card: Card) {
-  return [card.vod_year, card.vod_area].filter(Boolean).join(" · ");
-}
-
 function pageItems(page: number, pageCount: number): Array<number | "gap"> {
   if (pageCount <= 7) return Array.from({ length: pageCount }, (_, index) => index + 1);
   const keep = new Set<number>([1, pageCount]);
@@ -129,6 +131,7 @@ export function Pager({
     const next = Number(jump);
     if (!Number.isInteger(next) || next < 1 || next > pageCount || next === page) return;
     setJump("");
+    beginNavigation();
     router.push(hrefFor(next));
   }
 

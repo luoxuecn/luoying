@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async redirects() {
-    return [{ source: "/channel/:typeId", destination: "/list?typeId=:typeId", permanent: false }];
+    return [{ source: "/channel/:typeId", destination: "/list/:typeId", permanent: false }];
   },
   cacheComponents: true,
   devIndicators: false,

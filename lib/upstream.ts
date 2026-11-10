@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import { ApiError, asApiError, upstream } from "./errors";
 
 const ORIGIN = "https://dsystv.com";
@@ -73,6 +74,7 @@ async function requestText(url: URL, method: "GET" | "POST", body?: string) {
 }
 
 export async function upstreamText(path: string, init?: { method?: "GET" | "POST"; body?: string }) {
+  await io();
   const url = new URL(path, ORIGIN);
   if (url.origin !== ORIGIN || !allowedPath(url)) throw upstream();
   const method = init?.method || "GET";

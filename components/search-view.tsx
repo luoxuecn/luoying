@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import type { Card } from "@/lib/parse";
-import { LoadingBlock, Pager, PosterFace, Status } from "./media";
-import { useApi } from "./use-api";
+import { searchHref } from "@/lib/paths";
+import { Pager, PosterFace, Status } from "./media";
 
 interface SearchData {
   page: number;
@@ -20,31 +19,20 @@ function names(value?: string) {
   return value?.replace(/[,，]\s*/g, " ").replace(/\s+/g, " ").trim() || "";
 }
 
-export function SearchView() {
-  const params = useSearchParams();
-  const query = (params.get("q") || "").trim();
-  const page = params.get("page") || "";
-  const path = query ? `/api/search?q=${encodeURIComponent(query)}${page ? `&page=${encodeURIComponent(page)}` : ""}` : null;
-  const { status, data, error, retry } = useApi<SearchData>(path);
-
+export function SearchView({ query, data }: { query: string; data: SearchData | null }) {
   function pageHref(nextPage: number) {
-    const next = new URLSearchParams();
-    next.set("q", query);
-    if (nextPage > 1) next.set("page", String(nextPage));
-    return `/search?${next.toString()}`;
+    return searchHref(query, nextPage);
   }
 
   return (
     <div>
       <div className="page-head">
         <h1>{query ? `搜索「${query}」` : "搜索"}</h1>
-        {status === "ready" && data.totalExact ? <span className="faint">{data.total} 条结果</span> : null}
+        {data?.totalExact ? <span className="faint">{data.total} 条结果</span> : null}
       </div>
       {!query ? <Status title="输入片名后再搜索" /> : null}
-      {query && status === "loading" ? <LoadingBlock kind="rows" /> : null}
-      {query && status === "error" ? <Status title="搜索暂时不可用" detail={error.message} retry={error.retryable ? retry : undefined} /> : null}
-      {status === "ready" && data.empty ? <Status title="没有找到相关影片" detail="换一个关键词试试" /> : null}
-      {status === "ready" && !data.empty ? (
+      {query && data?.empty ? <Status title="没有找到相关影片" detail="换一个关键词试试" /> : null}
+      {query && data && !data.empty ? (
         <>
           <div className="search-list">
             {data.list.map((card) => {

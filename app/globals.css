@@ -40,6 +40,26 @@ img { display: block; max-width: 100%; }
 
 .site { min-height: 100vh; display: flex; flex-direction: column; }
 
+.nav-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  height: 2px;
+  width: 28%;
+  pointer-events: none;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: nav-progress 8s ease-out forwards;
+}
+
+@keyframes nav-progress {
+  0% { width: 0; }
+  15% { width: 32%; }
+  50% { width: 68%; }
+  100% { width: 90%; }
+}
+
 .header {
   position: sticky;
   top: 0;

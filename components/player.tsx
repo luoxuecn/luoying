@@ -6,7 +6,12 @@ import { IconRefresh } from "./icons";
 
 type Phase = "loading" | "ready" | "switch" | "error";
 
-export function Player({ playId }: { playId: string }) {
+export interface PlayReady {
+  parse: number;
+  url: string;
+}
+
+export function Player({ playId, initial = null }: { playId: string; initial?: PlayReady | null }) {
   const slotRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>("loading");
   const [message, setMessage] = useState("片源暂时不可用");
@@ -25,8 +30,17 @@ export function Player({ playId }: { playId: string }) {
     let art: Artplayer | null = null;
     let hls: { destroy: () => void } | null = null;
 
-    fetch(`/api/play?playId=${encodeURIComponent(playId)}`)
-      .then(async (response) => response.json() as Promise<{ ok: boolean; data?: { parse?: number; url?: string }; error?: { message?: string } }>)
+    const ready =
+      attempt === 0
+        ? Promise.resolve(
+            initial
+              ? { ok: true as const, data: initial }
+              : { ok: false as const, error: { message: "片源暂时不可用" } },
+          )
+        : fetch(`/api/play?playId=${encodeURIComponent(playId)}`).then(
+            async (response) => response.json() as Promise<{ ok: boolean; data?: { parse?: number; url?: string }; error?: { message?: string } }>,
+          );
+    ready
       .then(async (body) => {
         if (cancelled) return;
         if (!body.ok || !body.data) {
@@ -106,7 +120,7 @@ export function Player({ playId }: { playId: string }) {
       hls?.destroy();
       art?.destroy(true);
     };
-  }, [playId, attempt]);
+  }, [playId, attempt, initial]);
 
   return (
     <div className="player-frame">

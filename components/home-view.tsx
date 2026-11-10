@@ -5,8 +5,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { listHref } from "@/lib/links";
 import type { Card } from "@/lib/parse";
 import { IconChevronLeft, IconChevronRight } from "./icons";
-import { LoadingBlock, Poster, Status, cardMeta } from "./media";
-import { useApi } from "./use-api";
+import { cardMeta } from "@/lib/cards";
+import { Poster, Status } from "./media";
 
 interface HomeData {
   banner: Card[];
@@ -16,10 +16,7 @@ interface HomeData {
 
 const showHomeBanner = false;
 
-export function HomeView() {
-  const { status, data, error, retry } = useApi<HomeData>("/api/home");
-  if (status === "loading") return <LoadingBlock kind={showHomeBanner ? "home" : "grid"} />;
-  if (status === "error") return <Status title="首页暂时打不开" detail={error.message} retry={error.retryable ? retry : undefined} />;
+export function HomeView({ data }: { data: HomeData }) {
   const sections = data.sections.filter((section) => !section.title.includes("最近更新") && section.more?.target !== "latest");
   const hasCards = (showHomeBanner && data.banner.length > 0) || sections.some((section) => section.list.length > 0);
   if (!hasCards) return <Status title="暂时没有影片" />;

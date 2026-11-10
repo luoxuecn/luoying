@@ -2,21 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { CATEGORIES } from "@/lib/catalog";
+import { channelHref, listTypeFromPath, searchHref, searchQueryFromPath } from "@/lib/paths";
+import { beginNavigation } from "./navigation-progress";
 import { IconSearch } from "./icons";
 
 const LINKS = [
-  ...CATEGORIES.map((item) => ({ href: `/list?typeId=${item.type_id}&area=${encodeURIComponent("大陆")}`, label: item.type_name, key: item.type_id })),
+  ...CATEGORIES.map((item) => ({ href: channelHref(item.type_id), label: item.type_name, key: item.type_id })),
   { href: "/latest", label: "最近更新", key: "latest" },
   { href: "/rank", label: "排行榜", key: "rank" },
 ];
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const params = useSearchParams();
   const router = useRouter();
-  const query = params.get("q") || "";
+  const query = searchQueryFromPath(pathname);
+  const listType = listTypeFromPath(pathname);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -40,13 +42,12 @@ export function SiteHeader() {
         </button>
         <nav className="nav" aria-label="频道">
           {LINKS.map((item) => {
-            const listType = params.get("typeId") || "1";
             const active =
               item.key === "rank"
                 ? pathname.startsWith("/rank")
                 : item.key === "latest"
                   ? pathname.startsWith("/latest")
-                  : pathname === "/list" && listType === item.key;
+                  : pathname.startsWith("/list/") && listType === item.key;
             return (
               <Link className={active ? "active" : undefined} href={item.href} key={item.href}>
                 {item.label}
@@ -62,7 +63,8 @@ export function SiteHeader() {
               const data = new FormData(event.currentTarget);
               const keyword = String(data.get("q") || "").trim();
               if (!keyword) return;
-              router.push(`/search?q=${encodeURIComponent(keyword)}`);
+              beginNavigation();
+              router.push(searchHref(keyword));
             }}
           >
             <input key={query} name="q" defaultValue={query} placeholder="搜索片名" aria-label="搜索片名" />
@@ -82,7 +84,8 @@ export function SiteHeader() {
               const keyword = String(new FormData(event.currentTarget).get("q") || "").trim();
               if (!keyword) return;
               setOpen(false);
-              router.push(`/search?q=${encodeURIComponent(keyword)}`);
+              beginNavigation();
+              router.push(searchHref(keyword));
             }}
           >
             <input name="q" defaultValue={query} placeholder="搜索片名" aria-label="搜索片名" autoFocus />

@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { ListView } from "@/components/list-view";
-import { LoadingBlock } from "@/components/media";
+import { redirect } from "next/navigation";
+import { filterHref, filterHrefFromSearch } from "@/lib/paths";
 
 export const metadata: Metadata = { title: "筛选" };
+export const instant = false;
 
-export default function Page() {
-  return (
-    <Suspense fallback={<LoadingBlock />}>
-      <ListView />
-    </Suspense>
-  );
+export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const raw = await searchParams;
+  redirect(Object.keys(raw).length ? filterHrefFromSearch(raw) : filterHref({}));
 }

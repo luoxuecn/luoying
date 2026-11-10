@@ -1,12 +1,13 @@
 "use client";
 
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { beginNavigation } from "./navigation-progress";
 import { IconChevronLeft, IconChevronRight, IconSortDown, IconSortUp } from "./icons";
 import { lineScore, measureLine, readLineMeasure, type LineMeasure } from "./line-speed";
-import { Player } from "./player";
+import { Player, type PlayReady } from "./player";
+import { playHref } from "@/lib/paths";
 import { PosterFace, Status } from "./media";
-import { useApi } from "./use-api";
 
 interface Episode {
   name: string;
@@ -18,7 +19,7 @@ interface Source {
   episodes: Episode[];
 }
 
-interface Detail {
+export interface Detail {
   id: string;
   vod_name: string;
   vod_pic?: string;
@@ -35,26 +36,8 @@ interface Detail {
   vod_play_sources: Source[];
 }
 
-export function PlayView() {
-  const id = String(useParams<{ id: string }>().id || "");
+export function PlayView({ id, playId, data, source }: { id: string; playId: string; data: Detail; source: PlayReady | null }) {
   const router = useRouter();
-  const params = useSearchParams();
-  const playId = params.get("playId") || "";
-  const { status, data, error, retry } = useApi<Detail>(`/api/videos/${encodeURIComponent(id)}`);
-
-  useEffect(() => {
-    if (status === "ready" && data?.vod_name) document.title = `${data.vod_name} · 落雪影视`;
-  }, [data, status]);
-
-  useEffect(() => {
-    if (playId || !data) return;
-    const first = [...data.vod_play_sources].sort(byLineName)[0]?.episodes[0]?.playId;
-    if (first) router.replace(`/play/${id}?playId=${encodeURIComponent(first)}`);
-  }, [data, id, playId, router]);
-
-  if (status === "loading") return <PlaySkeleton />;
-  if (status === "error") return <Status title="影片暂时打不开" detail={error.message} retry={error.retryable ? retry : undefined} />;
-
   const sources = [...data.vod_play_sources].sort(byLineName);
   const current = sources.flatMap((source) => source.episodes).find((episode) => episode.playId === playId);
   const facts = [
@@ -69,12 +52,13 @@ export function PlayView() {
   ].filter((item): item is [string, string] => Boolean(item[1]));
 
   function open(nextPlayId: string) {
-    router.push(`/play/${id}?playId=${encodeURIComponent(nextPlayId)}`);
+    beginNavigation();
+    router.push(playHref(id, nextPlayId));
   }
 
   return (
     <div className="play-layout">
-      {playId ? <Player playId={playId} /> : <div className="player-frame"><div className="player-mask">正在选择剧集</div></div>}
+      {playId ? <Player playId={playId} initial={source} /> : <div className="player-frame"><div className="player-mask">正在选择剧集</div></div>}
       <div className="play-sheet">
         <div className="play-detail">
           <div className="play-meta">
@@ -350,11 +334,25 @@ function lineRank(measure: LineMeasure | "pending" | undefined, best: boolean) {
   return 3;
 }
 
+function pendingSpeeds(sources: Source[]) {
+  return Object.fromEntries(
+    sources.flatMap((source) => {
+      const playId = source.episodes[0]?.playId;
+      return playId ? [[source.name, readLineMeasure(playId) || "pending"] as const] : [];
+    }),
+  );
+}
+
 function LineRow({ sources, active, playId, onOpen }: { sources: Source[]; active: Source; playId: string; onOpen: (playId: string) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ left: false, right: false, hint: false });
-  const [speeds, setSpeeds] = useState<Record<string, LineMeasure | "pending">>({});
   const probeKey = sources.map((source) => source.episodes[0]?.playId || "").join("|");
+  const [trackedProbe, setTrackedProbe] = useState(probeKey);
+  const [speeds, setSpeeds] = useState<Record<string, LineMeasure | "pending">>(() => pendingSpeeds(sources));
+  if (probeKey !== trackedProbe) {
+    setTrackedProbe(probeKey);
+    setSpeeds(pendingSpeeds(sources));
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -362,7 +360,6 @@ function LineRow({ sources, active, playId, onOpen }: { sources: Source[]; activ
       const playId = source.episodes[0]?.playId;
       return playId ? [{ name: source.name, playId }] : [];
     });
-    setSpeeds(Object.fromEntries(jobs.map((job) => [job.name, readLineMeasure(job.playId) || "pending"])));
     let cursor = 0;
     async function worker() {
       while (cursor < jobs.length) {
