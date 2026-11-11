@@ -21,10 +21,6 @@ function names(value?: string) {
   return shownFact(value?.replace(/[,，]\s*/g, " "));
 }
 
-function summaryLine(card: Card) {
-  return [shownFact(card.vod_year), shownFact(card.vod_area), shownFact(card.type_name), names(card.vod_actor)].filter(Boolean).join(" · ");
-}
-
 export function SearchView({ query, data }: { query: string; data: SearchData | null }) {
   function pageHref(nextPage: number) {
     return searchHref(query, nextPage);
@@ -51,21 +47,21 @@ export function SearchView({ query, data }: { query: string; data: SearchData | 
                 ["年份", shownFact(card.vod_year)],
                 ["豆瓣", shownFact(card.vod_douban_score)],
               ].filter((item): item is [string, string] => Boolean(item[1]));
-              const summary = summaryLine(card);
               return (
                 <Link className="search-row grid grid-cols-[112px_1fr] items-start gap-3 rounded-xl p-3 hover:bg-elev sm:grid-cols-[168px_1fr] sm:gap-[18px] xl:grid-cols-[96px_1fr] xl:gap-3" href={`/play/${card.id}`} key={card.id}>
                   <PosterFace card={card} />
                   <div className="search-copy">
                     <h2>{card.vod_name}</h2>
-                    {summary ? <p className="search-summary mt-1.5 hidden truncate text-[13px] text-muted xl:block">{summary}</p> : null}
-                    <dl className="search-facts xl:hidden">
-                      {facts.map(([label, value]) => (
-                        <div key={label}>
-                          <dt>{label}：</dt>
-                          <dd className={label === "主演" ? "clamp" : undefined}>{value}</dd>
-                        </div>
-                      ))}
-                    </dl>
+                    {facts.length ? (
+                      <dl className="search-facts">
+                        {facts.map(([label, value]) => (
+                          <div key={label}>
+                            <dt>{label}：</dt>
+                            <dd className={label === "主演" ? "clamp" : undefined}>{value}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    ) : null}
                   </div>
                 </Link>
               );
