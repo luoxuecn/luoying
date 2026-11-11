@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { findHistory, readPlayIntent, saveProgress, writePlayIntent } from "@/lib/history";
 import { shownFact } from "@/lib/display";
 import { playHref } from "@/lib/paths";
@@ -49,6 +49,11 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
   const progressRef = useRef(0);
   const durationRef = useRef(0);
   const settled = useRef(false);
+  const filmId = useRef(id);
+  if (filmId.current !== id) {
+    filmId.current = id;
+    settled.current = false;
+  }
   const current = sources.flatMap((item) => item.episodes).find((episode) => episode.playId === playId);
 
   const remember = useCallback(
@@ -72,10 +77,10 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
     [data.vod_name, data.vod_pic, id, sources],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (settled.current) return;
     const intent = readPlayIntent(id);
-    if (intent && (intent === playId || !playId)) {
+    if (playId && intent === playId) {
       settled.current = true;
       return;
     }

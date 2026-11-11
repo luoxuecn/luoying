@@ -41,7 +41,7 @@ export default async function Page({
   if (!data) return <PageFailure title="影片暂时打不开" detail={failure?.message} retryable={failure?.retryable} />;
   return (
     <PlayRoute>
-      <PlayView id={id} playId="" data={data} source={null} />
+      <PlayView key={id} id={id} playId="" data={data} source={null} />
     </PlayRoute>
   );
 }

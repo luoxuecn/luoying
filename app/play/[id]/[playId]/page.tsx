@@ -44,7 +44,7 @@ export default async function Page({ params }: { params: Promise<{ id: string; p
   if (invalidPlay) return <PageFailure title="编号无效" detail="编号无效" />;
   return (
     <PlayRoute>
-      <PlayView id={id} playId={playId} data={data} source={source} />
+      <PlayView key={id} id={id} playId={playId} data={data} source={source} />
     </PlayRoute>
   );
 }
