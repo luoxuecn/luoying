@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { findHistory, readPlayIntent, saveProgress, writePlayIntent } from "@/lib/history";
 import { shownFact } from "@/lib/display";
 import { playHref } from "@/lib/paths";
+import { playDetail, playLayout, playLines, playSide, playStage, playTitle, playerFrame } from "@/lib/ui";
 import { beginNavigation } from "./navigation-progress";
 import { IconChevronLeft, IconChevronRight, IconSortDown, IconSortUp } from "./icons";
 import { lineScore, measureLine, type LineMeasure } from "./line-speed";
@@ -122,11 +123,11 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
   );
 
   return (
-    <div className="play-layout">
-      <div className="play-stage">
-        {playId ? <Player playId={playId} videoId={id} initial={source} onProgress={onProgress} /> : <div className="player-frame"><div className="player-mask">正在选择剧集</div></div>}
-        <h1 className="play-title">{title}</h1>
-        <div className="play-side">
+    <div className={playLayout}>
+      <div className={playStage}>
+        {playId ? <Player playId={playId} videoId={id} initial={source} onProgress={onProgress} /> : <div className={playerFrame}><div className="player-mask">正在选择剧集</div></div>}
+        <h1 className={playTitle}>{title}</h1>
+        <div className={playSide}>
           {sources.length ? (
             <EpisodePicker sources={sources} playId={playId} speeds={speeds} onSpeeds={setSpeeds} onOpen={open} />
           ) : (
@@ -134,8 +135,8 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
           )}
         </div>
       </div>
-      <div className="play-detail">
-        <div className="play-meta">
+      <div className={playDetail}>
+        <div className="play-meta mt-[18px] grid grid-cols-[104px_1fr] items-start gap-3 sm:grid-cols-[168px_1fr] sm:gap-[18px]">
           <PosterFace card={data} />
           <div className="play-copy">
             <dl className="search-facts">
@@ -156,13 +157,13 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
 
 export function PlaySkeleton() {
   return (
-    <div className="play-layout" aria-busy="true" aria-label="正在加载影片">
-      <div className="play-stage">
-        <div className="player-frame" />
-        <span className="play-title">
+    <div className={playLayout} aria-busy="true" aria-label="正在加载影片">
+      <div className={playStage}>
+        <div className={playerFrame} />
+        <span className={playTitle}>
           <span className="play-skel title" />
         </span>
-        <div className="play-side">
+        <div className={playSide}>
           <span className="play-skel head" />
           <div className="play-skel-lines">
             {Array.from({ length: 3 }, (_, index) => (
@@ -177,8 +178,8 @@ export function PlaySkeleton() {
           </div>
         </div>
       </div>
-      <div className="play-detail">
-        <div className="play-meta">
+      <div className={playDetail}>
+        <div className="play-meta mt-[18px] grid grid-cols-[104px_1fr] items-start gap-3 sm:grid-cols-[168px_1fr] sm:gap-[18px]">
           <div className="poster play-skel" />
           <div className="play-copy">
             {Array.from({ length: 6 }, (_, index) => (
@@ -308,7 +309,7 @@ function EpisodePicker({
   const visible = episodes.slice(current * EPISODE_PAGE, current * EPISODE_PAGE + EPISODE_PAGE);
   const pages = Array.from({ length: pageCount }, (_, index) => episodes.slice(index * EPISODE_PAGE, index * EPISODE_PAGE + EPISODE_PAGE));
   return (
-    <section className="play-lines">
+    <section className={playLines}>
       <div className="section-head">
         <h2>播放线路</h2>
       </div>

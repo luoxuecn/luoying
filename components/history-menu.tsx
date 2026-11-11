@@ -62,7 +62,7 @@ export function HistoryMenu() {
 
   return (
     <div
-      className="history-menu"
+      className="history-menu relative order-3 shrink-0 lg:order-4"
       ref={rootRef}
       onMouseEnter={() => {
         if (hoverable) setOpen(true);
@@ -122,14 +122,15 @@ export function HistoryMenu() {
   );
 }
 
-export function HistoryCover({ item }: { item: Pick<HistoryItem, "title" | "cover"> }) {
+export function HistoryCover({ item, large = false }: { item: Pick<HistoryItem, "title" | "cover">; large?: boolean }) {
   const [failed, setFailed] = useState(false);
   const src = item.cover && !failed ? item.cover : "";
+  const frame = large ? "history-cover w-[54px]" : "history-cover w-[42px]";
   return src ? (
     // Poster hosts vary per title, so the browser loads the stored address directly.
     // eslint-disable-next-line @next/next/no-img-element
-    <img className="history-cover" src={src} alt="" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+    <img className={frame} src={src} alt="" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
   ) : (
-    <span className="history-cover empty" aria-hidden="true" />
+    <span className={`${frame} block`} aria-hidden="true" />
   );
 }

@@ -24,14 +24,14 @@ export function HomeView({ data }: { data: HomeData }) {
     <div className="home">
       {showHomeBanner && data.banner.length ? <Banner items={data.banner} /> : null}
       {sections.map((section) => (
-        <section className="section" key={section.title}>
-          <div className="section-head">
-            <h2>
+        <section className="mt-[26px] first:-mt-3" key={section.title}>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="m-0 text-xl font-[650] tracking-tight">
               {section.title}
               {section.todayCount ? <span className="faint"> · 今日 {section.todayCount} 部</span> : null}
             </h2>
             {section.more ? (
-              <Link href={listHref(section.more)} aria-label="更多" title="更多">
+              <Link className="inline-flex size-7 items-center justify-center rounded-lg text-faint hover:bg-soft hover:text-fg" href={listHref(section.more)} aria-label="更多" title="更多">
                 <IconChevronRight size={16} />
               </Link>
             ) : null}
@@ -86,11 +86,17 @@ function CardRow({ children }: { children: ReactNode }) {
     node.scrollBy({ left: direction * Math.max(node.clientWidth - 48, 160), behavior: "smooth" });
   }
 
-  const rowClass = ["home-row", edges.fadeLeft ? "fade-left" : "", edges.fadeRight ? "fade-right" : ""].filter(Boolean).join(" ");
+  const mask = edges.fadeLeft && edges.fadeRight
+    ? "[mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-40px),transparent)]"
+    : edges.fadeLeft
+      ? "[mask-image:linear-gradient(to_right,transparent,#000_24px)]"
+      : edges.fadeRight
+        ? "[mask-image:linear-gradient(to_left,transparent,#000_40px)]"
+        : "";
 
   return (
-    <div className={rowClass}>
-      <div className="scroller" ref={ref}>
+    <div className="relative">
+      <div className={`flex snap-x snap-mandatory gap-3.5 overflow-x-auto [container-type:inline-size] [scrollbar-width:none] lg:[container-type:normal] ${mask} [&::-webkit-scrollbar]:hidden [&>.card]:w-[calc((100cqi-2*14px)/2.5)] [&>.card]:shrink-0 [&>.card]:snap-start sm:[&>.card]:w-[calc((100cqi-3*14px)/3.5)] md:[&>.card]:w-[calc((100cqi-4*14px)/4.5)] lg:[&>.card]:w-[148px]`} ref={ref}>
         {children}
       </div>
       {edges.left ? (
@@ -103,7 +109,7 @@ function CardRow({ children }: { children: ReactNode }) {
           <IconChevronRight />
         </button>
       ) : null}
-      {edges.fadeLeft || edges.fadeRight ? <p className="home-row-hint">左右滑动查看</p> : null}
+      {edges.fadeLeft || edges.fadeRight ? <p className="mt-2 text-xs text-faint lg:hidden">左右滑动查看</p> : null}
     </div>
   );
 }

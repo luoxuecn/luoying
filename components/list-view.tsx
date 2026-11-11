@@ -6,6 +6,7 @@ import { FILTERS, SORTS, categoryName, type FilterGroup } from "@/lib/catalog";
 import type { Card } from "@/lib/parse";
 import { filterHref, type ListQuery } from "@/lib/paths";
 import { cardMeta } from "@/lib/cards";
+import { chipLabel, chipRow, chipScroller, pageHead, pageTitle, posterGrid } from "@/lib/ui";
 import { Pager, Poster, Status } from "./media";
 
 interface ListData {
@@ -51,10 +52,10 @@ export function ListView({ query, data }: { query: ListQuery; data: ListData }) 
 
   return (
     <div>
-      <div className="page-head">
-        <h1>{name}</h1>
+      <div className={pageHead}>
+        <h1 className={pageTitle}>{name}</h1>
       </div>
-      <div className="filters">
+      <div className="mb-[18px] flex flex-col gap-2.5">
         {primary.map((group) => (
           <ChipRow label={group.name} key={group.key}>
             {group.value.map((option) => (
@@ -65,8 +66,8 @@ export function ListView({ query, data }: { query: ListQuery; data: ListData }) 
           </ChipRow>
         ))}
         {extra.length ? (
-          <div className="filter-row">
-            <div className="filter-label">更多</div>
+          <div className={chipRow}>
+            <div className={chipLabel}>更多</div>
             <button className={openMore ? "chip active" : "chip"} type="button" aria-expanded={openMore} onClick={() => setOpenMore((value) => !value)}>
               {openMore ? "收起筛选" : "更多筛选"}
             </button>
@@ -94,7 +95,7 @@ export function ListView({ query, data }: { query: ListQuery; data: ListData }) 
       {data.empty ? <Status title="没有找到相关影片" /> : null}
       {!data.empty ? (
         <>
-          <div className="grid">
+          <div className={posterGrid}>
             {data.list.map((card) => (
               <Poster card={card} key={card.id} meta={cardMeta(card)} />
             ))}
@@ -114,7 +115,7 @@ function ChipRow({ label, children }: { label: string; children: ReactNode }) {
     const node = ref.current;
     if (!node) return;
     const update = () => {
-      const narrow = window.matchMedia("(max-width: 1100px)").matches;
+      const narrow = window.matchMedia("(max-width: 1279px)").matches;
       const max = node.scrollWidth - node.clientWidth;
       setFade(narrow && max > 4 && node.scrollLeft < max - 4);
     };
@@ -131,9 +132,9 @@ function ChipRow({ label, children }: { label: string; children: ReactNode }) {
   }, []);
 
   return (
-    <div className="filter-row">
-      <div className="filter-label">{label}</div>
-      <div className={fade ? "chips fade-right" : "chips"} ref={ref}>
+    <div className={chipRow}>
+      <div className={chipLabel}>{label}</div>
+      <div className={fade ? `${chipScroller} max-xl:[mask-image:linear-gradient(to_right,#000_calc(100%-28px),transparent)]` : chipScroller} ref={ref}>
         {children}
       </div>
     </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { shownFact } from "@/lib/display";
 import type { Card } from "@/lib/parse";
 import { searchHref } from "@/lib/paths";
+import { pageHead, pageTitle } from "@/lib/ui";
 import { Pager, PosterFace, Status } from "./media";
 
 interface SearchData {
@@ -31,15 +32,15 @@ export function SearchView({ query, data }: { query: string; data: SearchData | 
 
   return (
     <div>
-      <div className="page-head">
-        <h1>{query ? `搜索「${query}」` : "搜索"}</h1>
+      <div className={pageHead}>
+        <h1 className={pageTitle}>{query ? `搜索「${query}」` : "搜索"}</h1>
         {data?.totalExact ? <span className="faint">{data.total} 条结果</span> : null}
       </div>
       {!query ? <Status title="输入片名后再搜索" /> : null}
       {query && data?.empty ? <Status title="没有找到相关影片" detail="换一个关键词试试" /> : null}
       {query && data && !data.empty ? (
         <>
-          <div className="search-list">
+          <div className="search-list flex flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-x-7 xl:gap-y-2">
             {data.list.map((card) => {
               const facts = [
                 ["主演", names(card.vod_actor)],
@@ -52,12 +53,12 @@ export function SearchView({ query, data }: { query: string; data: SearchData | 
               ].filter((item): item is [string, string] => Boolean(item[1]));
               const summary = summaryLine(card);
               return (
-                <Link className="search-row" href={`/play/${card.id}`} key={card.id}>
+                <Link className="search-row grid grid-cols-[112px_1fr] items-start gap-3 rounded-xl p-3 hover:bg-elev sm:grid-cols-[168px_1fr] sm:gap-[18px] xl:grid-cols-[96px_1fr] xl:gap-3" href={`/play/${card.id}`} key={card.id}>
                   <PosterFace card={card} />
                   <div className="search-copy">
                     <h2>{card.vod_name}</h2>
-                    {summary ? <p className="search-summary">{summary}</p> : null}
-                    <dl className="search-facts">
+                    {summary ? <p className="search-summary mt-1.5 hidden truncate text-[13px] text-muted xl:block">{summary}</p> : null}
+                    <dl className="search-facts xl:hidden">
                       {facts.map(([label, value]) => (
                         <div key={label}>
                           <dt>{label}：</dt>

@@ -3,6 +3,7 @@ import { rankAside } from "@/lib/display";
 import { filterHref } from "@/lib/paths";
 import type { Card } from "@/lib/parse";
 import { IconChevronRight } from "./icons";
+import { pageHead, pageTitle } from "@/lib/ui";
 import { PageFailure } from "./media";
 
 export function RankView({
@@ -12,12 +13,12 @@ export function RankView({
 }) {
   return (
     <div>
-      <div className="page-head">
-        <h1>排行榜</h1>
+      <div className={pageHead}>
+        <h1 className={pageTitle}>排行榜</h1>
       </div>
-      <div className="rank-board">
+      <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {panels.map((panel) => (
-          <section className="rank-panel" key={panel.typeId}>
+          <section className="rank-panel min-w-0 xl:col-span-2 xl:[&:nth-child(n+4)]:col-span-3" key={panel.typeId}>
             <div className="rank-head">
               <span className="rank-top">TOP</span>
               <h2>{panel.title}</h2>

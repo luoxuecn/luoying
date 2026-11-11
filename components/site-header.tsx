@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CATEGORIES } from "@/lib/catalog";
 import { channelHref, listTypeFromPath, searchHref, searchQueryFromPath } from "@/lib/paths";
+import { shell } from "@/lib/ui";
 import { HistoryMenu } from "./history-menu";
 import { beginNavigation } from "./navigation-progress";
 import { IconSearch } from "./icons";
@@ -32,17 +33,17 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="header">
-      <div className="header-inner">
-        <Link className="brand" href="/">
-          <img className="brand-mark" src="/mark.svg" alt="" width={22} height={22} />
+    <header className="sticky top-0 z-20 border-b border-line bg-bg/92 backdrop-blur-[16px]">
+      <div className={`${shell} flex min-h-16 flex-wrap content-center items-center gap-x-0.5 gap-y-0.5 py-2 lg:flex-nowrap lg:gap-[18px] lg:py-0`}>
+        <Link className="order-1 flex shrink-0 items-center gap-2 text-lg font-bold tracking-wide" href="/">
+          <img className="block size-[22px] rounded-md" src="/mark.svg" alt="" width={22} height={22} />
           落雪影视
         </Link>
-        <button className="search-icon" type="button" aria-label="搜索" aria-expanded={open} onClick={() => setOpen(true)}>
+        <button className="search-icon order-2 ml-auto inline-flex lg:hidden" type="button" aria-label="搜索" aria-expanded={open} onClick={() => setOpen(true)}>
           <IconSearch />
         </button>
         <HistoryMenu />
-        <nav className="nav" aria-label="频道">
+        <nav className="order-4 flex min-w-0 basis-full items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:order-2 lg:basis-auto" aria-label="频道">
           {LINKS.map((item) => {
             const active =
               item.key === "rank"
@@ -51,13 +52,13 @@ export function SiteHeader() {
                   ? pathname.startsWith("/latest")
                   : pathname.startsWith("/list/") && listType === item.key;
             return (
-              <Link className={active ? "active" : undefined} href={item.href} key={item.href}>
+              <Link className={active ? "shrink-0 rounded-lg bg-soft px-1.5 py-1.5 text-sm text-fg sm:px-2.5" : "shrink-0 rounded-lg px-1.5 py-1.5 text-sm text-muted hover:bg-soft hover:text-fg sm:px-2.5"} href={item.href} key={item.href}>
                 {item.label}
               </Link>
             );
           })}
         </nav>
-        <div className="search">
+        <div className="search order-3 ml-auto hidden min-w-0 flex-[0_1_240px] lg:block">
           <form
             action="/search"
             onSubmit={(event) => {

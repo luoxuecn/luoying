@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type Artplayer from "artplayer";
 import { findHistory } from "@/lib/history";
+import { playerFrame } from "@/lib/ui";
 import { IconRefresh } from "./icons";
 
 type Phase = "loading" | "ready" | "switch" | "error";
@@ -175,7 +176,7 @@ export function Player({
   }, [playId, videoId, attempt, initial]);
 
   return (
-    <div className="player-frame">
+    <div className={playerFrame}>
       <div className="art-slot" ref={slotRef} />
       {phase === "loading" ? <div className="player-mask">正在取播放地址</div> : null}
       {phase === "switch" ? <div className="player-mask">这条线路没有可播放的地址，换一条线路试试</div> : null}
