@@ -53,7 +53,7 @@ export function HomeView({ data }: { data: HomeData }) {
 
 function CardRow({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [edges, setEdges] = useState({ left: false, right: false });
+  const [edges, setEdges] = useState({ left: false, right: false, fadeLeft: false, fadeRight: false });
 
   useEffect(() => {
     const node = ref.current;
@@ -64,6 +64,8 @@ function CardRow({ children }: { children: ReactNode }) {
       setEdges({
         left: wide && node.scrollLeft > 4,
         right: wide && max > 4 && node.scrollLeft < max - 4,
+        fadeLeft: !wide && node.scrollLeft > 4,
+        fadeRight: !wide && max > 4 && node.scrollLeft < max - 4,
       });
     };
     update();
@@ -84,8 +86,10 @@ function CardRow({ children }: { children: ReactNode }) {
     node.scrollBy({ left: direction * Math.max(node.clientWidth - 48, 160), behavior: "smooth" });
   }
 
+  const rowClass = ["home-row", edges.fadeLeft ? "fade-left" : "", edges.fadeRight ? "fade-right" : ""].filter(Boolean).join(" ");
+
   return (
-    <div className="home-row">
+    <div className={rowClass}>
       <div className="scroller" ref={ref}>
         {children}
       </div>
@@ -99,6 +103,7 @@ function CardRow({ children }: { children: ReactNode }) {
           <IconChevronRight />
         </button>
       ) : null}
+      {edges.fadeLeft || edges.fadeRight ? <p className="home-row-hint">左右滑动查看</p> : null}
     </div>
   );
 }
