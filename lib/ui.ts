@@ -7,7 +7,6 @@ export const posterGrid = [
   "@min-[490px]:grid-cols-4 @min-[490px]:gap-x-3.5 @min-[490px]:gap-y-4",
   "@min-[742px]:grid-cols-6",
   "@min-[1120px]:grid-cols-9",
-  "@min-[1498px]:grid-cols-12",
 ].join(" ");
 
 export const homeStrip = [
@@ -18,12 +17,6 @@ export const homeStrip = [
   "@min-[742px]:[--fit:6]",
   "@min-[868px]:[--fit:7]",
   "@min-[994px]:[--fit:8]",
-  "@min-[1120px]:[--fit:9]",
-  "@min-[1246px]:[--fit:10]",
-  "@min-[1372px]:[--fit:11]",
-  "@min-[1498px]:[--fit:12]",
-  "@min-[1624px]:[--fit:13]",
-  "@min-[1750px]:[--fit:14]",
   "[&>.card]:shrink-0 [&>.card]:snap-start",
   "[&>.card]:w-[calc((100cqw-(min(var(--fit),var(--home-cards))-1)*var(--gap))/min(var(--fit),var(--home-cards)))]",
 ].join(" ");
