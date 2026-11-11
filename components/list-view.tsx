@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FILTERS, SORTS, categoryName, type FilterGroup } from "@/lib/catalog";
 import type { Card } from "@/lib/parse";
 import { filterHref, type ListQuery } from "@/lib/paths";
@@ -38,34 +39,57 @@ export function ListView({ query, data }: { query: ListQuery; data: ListData }) 
     return query[key] === value;
   };
 
+  const primary = filters.filter((group) => group.key !== "year" && group.key !== "letter");
+  const extra = filters.filter((group) => group.key === "year" || group.key === "letter");
+  const extraKey = `${query.year}|${query.letter}`;
+  const [trackedExtra, setTrackedExtra] = useState(extraKey);
+  const [openMore, setOpenMore] = useState(Boolean(query.year || query.letter));
+  if (trackedExtra !== extraKey) {
+    setTrackedExtra(extraKey);
+    if (query.year || query.letter) setOpenMore(true);
+  }
+
   return (
     <div>
       <div className="page-head">
         <h1>{name}</h1>
       </div>
       <div className="filters">
-        {filters.map((group) => (
-          <div className="filter-row" key={group.key}>
-            <div className="filter-label">{group.name}</div>
-            <div className="chips">
-              {group.value.map((option) => (
-                <Link className={active(group.key, option.value) ? "chip active" : "chip"} href={hrefFor(group.key, option.value)} key={`${group.key}-${option.value}`}>
-                  {option.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
-        <div className="filter-row">
-          <div className="filter-label">排序</div>
-          <div className="chips">
-            {SORTS.map((option) => (
-              <Link className={active("order", option.value) ? "chip active" : "chip"} href={hrefFor("order", option.value)} key={option.value}>
+        {primary.map((group) => (
+          <ChipRow label={group.name} key={group.key}>
+            {group.value.map((option) => (
+              <Link className={active(group.key, option.value) ? "chip active" : "chip"} href={hrefFor(group.key, option.value)} key={`${group.key}-${option.value}`}>
                 {option.name}
               </Link>
             ))}
+          </ChipRow>
+        ))}
+        {extra.length ? (
+          <div className="filter-row">
+            <div className="filter-label">更多</div>
+            <button className={openMore ? "chip active" : "chip"} type="button" aria-expanded={openMore} onClick={() => setOpenMore((value) => !value)}>
+              {openMore ? "收起筛选" : "更多筛选"}
+            </button>
           </div>
-        </div>
+        ) : null}
+        {openMore
+          ? extra.map((group) => (
+              <ChipRow label={group.name} key={group.key}>
+                {group.value.map((option) => (
+                  <Link className={active(group.key, option.value) ? "chip active" : "chip"} href={hrefFor(group.key, option.value)} key={`${group.key}-${option.value}`}>
+                    {option.name}
+                  </Link>
+                ))}
+              </ChipRow>
+            ))
+          : null}
+        <ChipRow label="排序">
+          {SORTS.map((option) => (
+            <Link className={active("order", option.value) ? "chip active" : "chip"} href={hrefFor("order", option.value)} key={option.value}>
+              {option.name}
+            </Link>
+          ))}
+        </ChipRow>
       </div>
       {data.empty ? <Status title="没有找到相关影片" /> : null}
       {!data.empty ? (
@@ -78,6 +102,40 @@ export function ListView({ query, data }: { query: ListQuery; data: ListData }) 
           <Pager page={data.page} pageCount={data.pageCount} total={data.total} totalExact={data.totalExact} hrefFor={pageHref} />
         </>
       ) : null}
+    </div>
+  );
+}
+
+function ChipRow({ label, children }: { label: string; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [fade, setFade] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const update = () => {
+      const narrow = window.matchMedia("(max-width: 1100px)").matches;
+      const max = node.scrollWidth - node.clientWidth;
+      setFade(narrow && max > 4 && node.scrollLeft < max - 4);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(node);
+    node.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      observer.disconnect();
+      node.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  return (
+    <div className="filter-row">
+      <div className="filter-label">{label}</div>
+      <div className={fade ? "chips fade-right" : "chips"} ref={ref}>
+        {children}
+      </div>
     </div>
   );
 }

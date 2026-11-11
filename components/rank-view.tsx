@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { rankAside } from "@/lib/display";
 import { filterHref } from "@/lib/paths";
 import type { Card } from "@/lib/parse";
 import { IconChevronRight } from "./icons";
@@ -28,15 +29,18 @@ export function RankView({
             {!panel.error && panel.list.length === 0 ? <p className="rank-empty">这个榜单暂时没有影片</p> : null}
             {!panel.error && panel.list.length > 0 ? (
               <ol className="rank-list">
-                {panel.list.map((card, index) => (
-                  <li key={card.id}>
-                    <Link href={`/play/${card.id}`}>
-                      <span className={index < 3 ? "rank-no hot" : "rank-no"}>{index + 1}</span>
-                      <span className="rank-name">{card.vod_name}</span>
-                      {card.vod_remarks || card.vod_douban_score ? <span className="rank-note">{card.vod_remarks || card.vod_douban_score}</span> : null}
-                    </Link>
-                  </li>
-                ))}
+                {panel.list.map((card, index) => {
+                  const note = rankAside(card);
+                  return (
+                    <li key={card.id}>
+                      <Link href={`/play/${card.id}`}>
+                        <span className={index < 3 ? "rank-no hot" : "rank-no"}>{index + 1}</span>
+                        <span className="rank-name">{card.vod_name}</span>
+                        {note ? <span className="rank-note">{note}</span> : null}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ol>
             ) : null}
           </section>

@@ -75,7 +75,7 @@ export function Player({
         const source = body.data.url;
         const [{ default: Artplayer }, { default: Hls }] = await Promise.all([import("artplayer"), import("hls.js")]);
         if (cancelled || !slotRef.current) return;
-        const useHls = source.includes(".m3u8");
+        const useHls = source.includes(".m3u8") || source.includes("hls=1");
         art = new Artplayer({
           container: slotRef.current,
           url: source,

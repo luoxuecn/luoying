@@ -8,6 +8,7 @@ import {
 } from "./catalog";
 import { invalid } from "./errors";
 import { moviePath, playPath } from "./ids";
+import { playbackPath } from "./media-proxy";
 import { parseChannel, parseDetail, parseHome, parseLatest, parsePlay, parseRss, parseSearch, parseVideoList } from "./parse";
 import { UPSTREAM_UA, upstreamText } from "./upstream";
 
@@ -112,10 +113,11 @@ export async function getPlay(params: URLSearchParams) {
   if (!parsed.media) {
     return { parse: 1, url: "", urls: [], header: {} };
   }
+  const url = playbackPath(parsed.url);
   return {
     parse: 0,
-    url: parsed.url,
-    urls: [{ name: "播放", url: parsed.url }],
+    url,
+    urls: [{ name: "播放", url }],
     header: {
       "User-Agent": UPSTREAM_UA,
       Referer: `https://dsystv.com${path}`,

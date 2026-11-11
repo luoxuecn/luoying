@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { beginNavigation } from "./navigation-progress";
 import { useState, type FormEvent } from "react";
+import { posterRemark } from "@/lib/display";
 import type { Card } from "@/lib/parse";
 import { IconChevronLeft, IconChevronRight, IconEnter, IconRefresh } from "./icons";
 
@@ -78,15 +79,19 @@ export function Poster({ card, meta }: { card: Card; meta?: string }) {
 
 export function PosterFace({ card }: { card: Pick<Card, "vod_name" | "vod_pic" | "vod_remarks" | "vod_douban_score"> }) {
   const [failed, setFailed] = useState(false);
+  const remark = posterRemark(card.vod_remarks);
+  const missing = !card.vod_pic || failed;
   return (
     <div className="poster">
-      {card.vod_pic && !failed ? (
+      {missing ? (
+        <span className="poster-fallback">{card.vod_name}</span>
+      ) : (
         // Poster hosts vary per title, so the browser loads the address from the API directly.
         // eslint-disable-next-line @next/next/no-img-element
         <img src={card.vod_pic} alt={card.vod_name} referrerPolicy="no-referrer" onError={() => setFailed(true)} />
-      ) : null}
+      )}
       {card.vod_douban_score ? <span className="badge score">{card.vod_douban_score}</span> : null}
-      {card.vod_remarks ? <span className="badge note">{card.vod_remarks}</span> : null}
+      {remark ? <span className="badge note">{remark}</span> : null}
     </div>
   );
 }
