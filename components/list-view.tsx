@@ -5,7 +5,6 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FILTERS, SORTS, categoryName, type FilterGroup } from "@/lib/catalog";
 import type { Card } from "@/lib/parse";
 import { filterHref, type ListQuery } from "@/lib/paths";
-import { cardMeta } from "@/lib/cards";
 import { chipLabel, chipRow, chipScroller, pageHead, pageTitle, posterFrame, posterGrid } from "@/lib/ui";
 import { Pager, Poster, Status } from "./media";
 
@@ -98,7 +97,7 @@ export function ListView({ query, data }: { query: ListQuery; data: ListData }) 
           <div className={posterFrame}>
             <div className={posterGrid}>
               {data.list.map((card) => (
-                <Poster card={card} key={card.id} meta={cardMeta(card)} />
+                <Poster card={card} key={card.id} />
               ))}
             </div>
           </div>

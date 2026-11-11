@@ -5,7 +5,6 @@ import { Children, useEffect, useRef, useState, type CSSProperties, type ReactNo
 import { listHref } from "@/lib/links";
 import type { Card } from "@/lib/parse";
 import { IconChevronLeft, IconChevronRight } from "./icons";
-import { cardMeta } from "@/lib/cards";
 import { homeStrip, posterFrame } from "@/lib/ui";
 import { Poster, Status } from "./media";
 
@@ -40,7 +39,7 @@ export function HomeView({ data }: { data: HomeData }) {
           {section.list.length ? (
             <CardRow>
               {section.list.map((card) => (
-                <Poster card={card} key={card.id} meta={cardMeta(card)} />
+                <Poster card={card} key={card.id} />
               ))}
             </CardRow>
           ) : (

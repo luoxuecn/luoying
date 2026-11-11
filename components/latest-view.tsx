@@ -2,7 +2,6 @@ import Link from "next/link";
 import { CATEGORIES, categoryName } from "@/lib/catalog";
 import type { Card } from "@/lib/parse";
 import { latestHref } from "@/lib/paths";
-import { cardMeta } from "@/lib/cards";
 import { pageHead, pageTitle, posterFrame, posterGrid } from "@/lib/ui";
 import { Poster, Status } from "./media";
 
@@ -33,7 +32,7 @@ export function LatestView({ typeId, data }: { typeId: string; data: LatestData 
         <div className={posterFrame}>
           <div className={posterGrid}>
             {data.list.map((card) => (
-              <Poster card={card} key={card.id} meta={cardMeta(card)} />
+              <Poster card={card} key={card.id} />
             ))}
           </div>
         </div>

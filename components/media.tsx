@@ -72,12 +72,11 @@ export function LoadingBlock({ kind = "grid" }: { kind?: "grid" | "home" | "rows
   );
 }
 
-export function Poster({ card, meta }: { card: Card; meta?: string }) {
+export function Poster({ card }: { card: Card }) {
   return (
     <Link className="card" href={`/play/${card.id}`}>
       <PosterFace card={card} />
       <p className="card-title">{card.vod_name}</p>
-      {meta ? <p className="card-meta">{meta}</p> : null}
     </Link>
   );
 }
