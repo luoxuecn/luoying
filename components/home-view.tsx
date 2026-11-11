@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Children, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { listHref } from "@/lib/links";
 import type { Card } from "@/lib/parse";
 import { IconChevronLeft, IconChevronRight } from "./icons";
 import { cardMeta } from "@/lib/cards";
+import { homeStrip, posterFrame } from "@/lib/ui";
 import { Poster, Status } from "./media";
 
 interface HomeData {
@@ -94,10 +95,14 @@ function CardRow({ children }: { children: ReactNode }) {
         ? "[mask-image:linear-gradient(to_left,transparent,#000_40px)]"
         : "";
 
+  const count = Math.max(Children.count(children), 1);
+
   return (
     <div className="relative">
-      <div className={`flex snap-x snap-mandatory gap-3.5 overflow-x-auto [container-type:inline-size] [scrollbar-width:none] lg:[container-type:normal] ${mask} [&::-webkit-scrollbar]:hidden [&>.card]:w-[calc((100cqi-20px)/3)] [&>.card]:shrink-0 [&>.card]:snap-start sm:[&>.card]:w-[calc((100cqi-3*14px)/3.5)] md:[&>.card]:w-[calc((100cqi-4*14px)/4.5)] lg:[&>.card]:w-[148px]`} ref={ref}>
-        {children}
+      <div className={posterFrame}>
+        <div className={`${homeStrip} ${mask}`} style={{ "--home-cards": count } as CSSProperties} ref={ref}>
+          {children}
+        </div>
       </div>
       {edges.left ? (
         <button className="home-row-nav prev" type="button" aria-label="向左查看" onClick={() => move(-1)}>

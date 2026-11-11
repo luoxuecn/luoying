@@ -1,6 +1,7 @@
 import {
   categoriesPayload,
   categoryName,
+  channelForTid,
   isAllowedFilter,
   isAllowedOrder,
   isChannelId,
@@ -9,7 +10,7 @@ import {
 import { invalid } from "./errors";
 import { moviePath, playPath } from "./ids";
 import { playbackPath } from "./media-proxy";
-import { parseChannel, parseDetail, parseHome, parseLatest, parsePlay, parseRss, parseSearch, parseVideoList } from "./parse";
+import { parseChannel, parseDetail, parseHome, parseLatest, parsePlay, parseRss, parseSearch, parseVideoList, type Section } from "./parse";
 import { UPSTREAM_UA, upstreamText } from "./upstream";
 
 function readPage(params: URLSearchParams) {
@@ -39,9 +40,36 @@ export function getCategories() {
   return categoriesPayload();
 }
 
+const HOME_SECTION_MIN = 8;
+
+async function fillHomeSection(section: Section) {
+  if (section.list.length >= HOME_SECTION_MIN) return;
+  if (section.more?.target === "latest" || section.title.includes("最近更新")) return;
+  const more = section.more;
+  const typeId = more?.typeId && isChannelId(more.typeId) ? more.typeId : channelForTid(more?.tid || "");
+  if (!typeId) return;
+  const params = new URLSearchParams({ typeId });
+  if (more?.tid && more.tid !== typeId) params.set("tid", more.tid);
+  if (more?.order && more.order !== "time") params.set("order", more.order);
+  try {
+    const page = await getVideos(params);
+    const seen = new Set(section.list.map((card) => card.id));
+    for (const card of page.list) {
+      if (section.list.length >= HOME_SECTION_MIN) break;
+      if (seen.has(card.id)) continue;
+      section.list.push(card);
+      seen.add(card.id);
+    }
+  } catch {
+    return;
+  }
+}
+
 export async function getHome() {
   const html = await upstreamText("/");
-  return parseHome(html);
+  const home = parseHome(html);
+  await Promise.all(home.sections.map((section) => fillHomeSection(section)));
+  return home;
 }
 
 export async function getChannel(typeId: string) {

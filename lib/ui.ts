@@ -1,7 +1,32 @@
 export const shell = "mx-auto w-[min(1840px,calc(100%-24px))] sm:w-[min(1840px,calc(100%-40px))]";
 
-export const posterGrid =
-  "grid grid-cols-3 gap-2.5 sm:grid-cols-4 sm:gap-x-3.5 sm:gap-y-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8";
+export const posterFrame = "@container";
+
+export const posterGrid = [
+  "grid grid-cols-3 gap-2.5",
+  "@min-[490px]:grid-cols-4 @min-[490px]:gap-x-3.5 @min-[490px]:gap-y-4",
+  "@min-[742px]:grid-cols-6",
+  "@min-[1120px]:grid-cols-9",
+  "@min-[1498px]:grid-cols-12",
+].join(" ");
+
+export const homeStrip = [
+  "flex snap-x snap-mandatory gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+  "[--fit:3] [--gap:10px]",
+  "@min-[490px]:gap-3.5 @min-[490px]:[--fit:4] @min-[490px]:[--gap:14px]",
+  "@min-[616px]:[--fit:5]",
+  "@min-[742px]:[--fit:6]",
+  "@min-[868px]:[--fit:7]",
+  "@min-[994px]:[--fit:8]",
+  "@min-[1120px]:[--fit:9]",
+  "@min-[1246px]:[--fit:10]",
+  "@min-[1372px]:[--fit:11]",
+  "@min-[1498px]:[--fit:12]",
+  "@min-[1624px]:[--fit:13]",
+  "@min-[1750px]:[--fit:14]",
+  "[&>.card]:shrink-0 [&>.card]:snap-start",
+  "[&>.card]:w-[calc((100cqw-(min(var(--fit),var(--home-cards))-1)*var(--gap))/min(var(--fit),var(--home-cards)))]",
+].join(" ");
 
 export const pageHead = "mb-4 flex items-baseline justify-between gap-3";
 

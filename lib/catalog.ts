@@ -201,6 +201,15 @@ export function categoryName(typeId: string) {
   return CATEGORIES.find((item) => item.type_id === typeId)?.type_name ?? "";
 }
 
+export function channelForTid(tid: string): Category["type_id"] | "" {
+  if (isChannelId(tid)) return tid;
+  for (const category of CATEGORIES) {
+    const group = FILTERS[category.type_id].find((item) => item.key === "tid");
+    if (group?.value.some((item) => item.value === tid)) return category.type_id;
+  }
+  return "";
+}
+
 export function isAllowedOrder(value: string) {
   return ORDER_VALUES.has(value);
 }

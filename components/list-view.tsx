@@ -6,7 +6,7 @@ import { FILTERS, SORTS, categoryName, type FilterGroup } from "@/lib/catalog";
 import type { Card } from "@/lib/parse";
 import { filterHref, type ListQuery } from "@/lib/paths";
 import { cardMeta } from "@/lib/cards";
-import { chipLabel, chipRow, chipScroller, pageHead, pageTitle, posterGrid } from "@/lib/ui";
+import { chipLabel, chipRow, chipScroller, pageHead, pageTitle, posterFrame, posterGrid } from "@/lib/ui";
 import { Pager, Poster, Status } from "./media";
 
 interface ListData {
@@ -95,10 +95,12 @@ export function ListView({ query, data }: { query: ListQuery; data: ListData }) 
       {data.empty ? <Status title="没有找到相关影片" /> : null}
       {!data.empty ? (
         <>
-          <div className={posterGrid}>
-            {data.list.map((card) => (
-              <Poster card={card} key={card.id} meta={cardMeta(card)} />
-            ))}
+          <div className={posterFrame}>
+            <div className={posterGrid}>
+              {data.list.map((card) => (
+                <Poster card={card} key={card.id} meta={cardMeta(card)} />
+              ))}
+            </div>
           </div>
           <Pager page={data.page} pageCount={data.pageCount} total={data.total} totalExact={data.totalExact} hrefFor={pageHref} />
         </>

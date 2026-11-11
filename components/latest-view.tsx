@@ -3,7 +3,7 @@ import { CATEGORIES, categoryName } from "@/lib/catalog";
 import type { Card } from "@/lib/parse";
 import { latestHref } from "@/lib/paths";
 import { cardMeta } from "@/lib/cards";
-import { pageHead, pageTitle, posterGrid } from "@/lib/ui";
+import { pageHead, pageTitle, posterFrame, posterGrid } from "@/lib/ui";
 import { Poster, Status } from "./media";
 
 interface LatestData {
@@ -30,10 +30,12 @@ export function LatestView({ typeId, data }: { typeId: string; data: LatestData 
       </div>
       {data.empty || data.list.length === 0 ? <Status title="暂时没有更新" /> : null}
       {data.list.length ? (
-        <div className={posterGrid}>
-          {data.list.map((card) => (
-            <Poster card={card} key={card.id} meta={cardMeta(card)} />
-          ))}
+        <div className={posterFrame}>
+          <div className={posterGrid}>
+            {data.list.map((card) => (
+              <Poster card={card} key={card.id} meta={cardMeta(card)} />
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

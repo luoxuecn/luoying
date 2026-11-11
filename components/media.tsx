@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { beginNavigation } from "./navigation-progress";
 import { useState, type FormEvent } from "react";
 import { posterRemark } from "@/lib/display";
-import { posterGrid } from "@/lib/ui";
+import { posterFrame, posterGrid } from "@/lib/ui";
 import type { Card } from "@/lib/parse";
 import { IconChevronLeft, IconChevronRight, IconEnter, IconRefresh } from "./icons";
 
@@ -42,10 +42,12 @@ export function LoadingBlock({ kind = "grid" }: { kind?: "grid" | "home" | "rows
     return (
       <div>
         <div className="skeleton-banner" />
-        <div className={`${posterGrid} mt-[22px]`}>
-          {Array.from({ length: 6 }, (_, index) => (
-            <div className="skeleton-card" key={index} />
-          ))}
+        <div className={`${posterFrame} mt-[22px]`}>
+          <div className={posterGrid}>
+            {Array.from({ length: 6 }, (_, index) => (
+              <div className="skeleton-card" key={index} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -60,10 +62,12 @@ export function LoadingBlock({ kind = "grid" }: { kind?: "grid" | "home" | "rows
     );
   }
   return (
-    <div className={posterGrid} aria-busy="true">
-      {Array.from({ length: 12 }, (_, index) => (
-        <div className="skeleton-card" key={index} />
-      ))}
+    <div className={posterFrame} aria-busy="true">
+      <div className={posterGrid}>
+        {Array.from({ length: 12 }, (_, index) => (
+          <div className="skeleton-card" key={index} />
+        ))}
+      </div>
     </div>
   );
 }
