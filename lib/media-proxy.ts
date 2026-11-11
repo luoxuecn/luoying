@@ -6,10 +6,11 @@ import { UPSTREAM_UA } from "./upstream";
 
 const TTL_MS = 6 * 60 * 60 * 1000;
 const PLAYLIST_LIMIT = 2 * 1024 * 1024;
-const DEV_SECRET = "luoxue-media-proxy-dev-key";
 
 function secret() {
-  return process.env.MEDIA_PROXY_SECRET || DEV_SECRET;
+  const value = process.env.MEDIA_PROXY_SECRET;
+  if (!value) throw new Error("MEDIA_PROXY_SECRET is not set");
+  return value;
 }
 
 function signPayload(payload: string) {
