@@ -546,6 +546,7 @@ function LineRow({
 function EpisodeGrid({ episodes, playId, units, onOpen }: { episodes: Episode[]; playId: string; units: number; onOpen: (playId: string) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [full, setFull] = useState(false);
+  const [pane, setPane] = useState(false);
 
   useEffect(() => {
     const node = ref.current;
@@ -554,6 +555,7 @@ function EpisodeGrid({ episodes, playId, units, onOpen }: { episodes: Episode[];
       const font = Number.parseFloat(getComputedStyle(node).fontSize) || 14;
       const size = units * font + 18;
       setFull(size >= node.clientWidth - 1);
+      setPane(node.scrollHeight > node.clientHeight + 1);
     };
     update();
     const observer = new ResizeObserver(update);
@@ -578,7 +580,7 @@ function EpisodeGrid({ episodes, playId, units, onOpen }: { episodes: Episode[];
   }, [playId, episodeKey]);
 
   return (
-    <div className={full ? "episodes stack local-scroll" : "episodes local-scroll"} ref={ref} style={{ "--ep-units": units } as CSSProperties}>
+    <div className={["episodes local-scroll", full ? "stack" : "", pane ? "pane" : ""].filter(Boolean).join(" ")} ref={ref} style={{ "--ep-units": units } as CSSProperties}>
       {episodes.map((episode) => (
         <button className={episode.playId === playId ? "episode active" : "episode"} type="button" key={episode.playId} onClick={() => onOpen(episode.playId)}>
           {episode.name}

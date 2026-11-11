@@ -831,6 +831,12 @@ img { display: block; max-width: 100%; }
     padding-top: 4px;
     overflow: auto;
   }
+  /* Sidebar padding is 16px. Center the 8px bar in that padding: 4px on each side. */
+  .episodes.pane {
+    margin-right: -12px;
+    padding-right: 4px;
+    scrollbar-gutter: stable;
+  }
 }
 .episode {
   width: 100%;
@@ -880,6 +886,8 @@ img { display: block; max-width: 100%; }
   .state { min-height: 200px; padding: 24px 16px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
+
 
 
 
