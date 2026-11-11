@@ -1,5 +1,4 @@
 const BLANK = /^(内详|不详|暂无|未知)$/;
-const CLARITY = /^(?:更新至)?HD(?:中字|国语)?$/;
 
 export function shownFact(value?: string) {
   const text = (value || "").replace(/\s+/g, " ").trim();
@@ -14,15 +13,13 @@ export function formatRemark(value?: string) {
 }
 
 export function posterRemark(value?: string) {
-  const text = formatRemark(value);
-  if (!text || CLARITY.test(text)) return "";
-  return text;
+  return formatRemark(value);
 }
 
 export function rankAside(card: { vod_remarks?: string; vod_douban_score?: string }) {
   const remark = formatRemark(card.vod_remarks);
-  if (remark && !CLARITY.test(remark)) return remark;
+  if (remark) return remark;
   const score = (card.vod_douban_score || "").trim();
-  if (score && !score.includes("暂无") && !CLARITY.test(score)) return score;
+  if (score && !score.includes("暂无")) return score;
   return "";
 }
