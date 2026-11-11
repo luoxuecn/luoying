@@ -9,11 +9,6 @@ import { playHref, queryValue } from "@/lib/paths";
 
 export const instant = false;
 
-function firstPlayId(sources: Detail["vod_play_sources"]) {
-  const ordered = [...sources].sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true, sensitivity: "base" }));
-  return ordered[0]?.episodes[0]?.playId || "";
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
     const { id } = await params;
@@ -44,8 +39,6 @@ export default async function Page({
     failure = { message: api.message, retryable: api.retryable };
   }
   if (!data) return <PageFailure title="影片暂时打不开" detail={failure?.message} retryable={failure?.retryable} />;
-  const first = firstPlayId(data.vod_play_sources);
-  if (first) redirect(playHref(id, first));
   return (
     <PlayRoute>
       <PlayView id={id} playId="" data={data} source={null} />

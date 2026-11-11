@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type Artplayer from "artplayer";
+import { findHistory } from "@/lib/history";
 import { IconRefresh } from "./icons";
 
 type Phase = "loading" | "ready" | "switch" | "error";
@@ -11,8 +12,19 @@ export interface PlayReady {
   url: string;
 }
 
-export function Player({ playId, initial = null }: { playId: string; initial?: PlayReady | null }) {
+export function Player({
+  playId,
+  videoId,
+  initial = null,
+  onProgress,
+}: {
+  playId: string;
+  videoId: string;
+  initial?: PlayReady | null;
+  onProgress?: (progress: number, duration: number, reason: "time" | "pause" | "ended") => void;
+}) {
   const slotRef = useRef<HTMLDivElement>(null);
+  const onProgressRef = useRef(onProgress);
   const [phase, setPhase] = useState<Phase>("loading");
   const [message, setMessage] = useState("片源暂时不可用");
   const [attempt, setAttempt] = useState(0);
@@ -24,11 +36,19 @@ export function Player({ playId, initial = null }: { playId: string; initial?: P
   }
 
   useEffect(() => {
+    onProgressRef.current = onProgress;
+  });
+
+  useEffect(() => {
     const slot = slotRef.current;
     if (!slot) return;
     let cancelled = false;
     let art: Artplayer | null = null;
     let hls: { destroy: () => void } | null = null;
+    const record = findHistory(videoId);
+    const startAt = record && record.playId === playId ? record.progress : 0;
+    let armed = startAt < 1;
+    let lastWrite = 0;
 
     const ready =
       attempt === 0
@@ -100,6 +120,38 @@ export function Player({ playId, initial = null }: { playId: string; initial?: P
             },
           },
         });
+        const place = () => {
+          if (cancelled || !art || armed) return;
+          const duration = Number(art.duration);
+          if (!Number.isFinite(duration) || duration <= 1) return;
+          const target = Math.min(startAt, Math.max(0, duration - 1));
+          if (target >= 1 && art.currentTime < target - 1) art.currentTime = target;
+          if (art.currentTime >= target - 1.5) armed = true;
+        };
+        const report = (reason: "time" | "pause" | "ended") => {
+          const notify = onProgressRef.current;
+          if (cancelled || !art || !armed || !notify) return;
+          const duration = Number(art.duration);
+          const progress = Number(art.currentTime);
+          if (!Number.isFinite(progress)) return;
+          if (reason === "time") {
+            const now = Date.now();
+            if (now - lastWrite < 5000) return;
+            lastWrite = now;
+          } else {
+            lastWrite = Date.now();
+          }
+          notify(progress, Number.isFinite(duration) ? duration : 0, reason);
+        };
+        art.on("ready", place);
+        art.on("video:loadedmetadata", place);
+        art.on("video:canplay", place);
+        art.on("video:timeupdate", () => {
+          place();
+          report("time");
+        });
+        art.on("video:pause", () => report("pause"));
+        art.on("video:ended", () => report("ended"));
         if (!cancelled) setPhase("ready");
         art.on("error", () => {
           if (!cancelled) {
@@ -120,7 +172,7 @@ export function Player({ playId, initial = null }: { playId: string; initial?: P
       hls?.destroy();
       art?.destroy(true);
     };
-  }, [playId, attempt, initial]);
+  }, [playId, videoId, attempt, initial]);
 
   return (
     <div className="player-frame">

@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { findHistory, readPlayIntent, saveProgress, writePlayIntent } from "@/lib/history";
+import { playHref } from "@/lib/paths";
 import { beginNavigation } from "./navigation-progress";
 import { IconChevronLeft, IconChevronRight, IconSortDown, IconSortUp } from "./icons";
-import { lineScore, measureLine, readLineMeasure, type LineMeasure } from "./line-speed";
+import { lineScore, measureLine, type LineMeasure } from "./line-speed";
 import { Player, type PlayReady } from "./player";
-import { playHref } from "@/lib/paths";
+import { chooseResume, episodeIndex } from "./resume";
 import { PosterFace, Status } from "./media";
 
 interface Episode {
@@ -38,8 +40,56 @@ export interface Detail {
 
 export function PlayView({ id, playId, data, source }: { id: string; playId: string; data: Detail; source: PlayReady | null }) {
   const router = useRouter();
-  const sources = [...data.vod_play_sources].sort(byLineName);
-  const current = sources.flatMap((source) => source.episodes).find((episode) => episode.playId === playId);
+  const sources = useMemo(() => [...data.vod_play_sources].sort(byLineName), [data.vod_play_sources]);
+  const [speeds, setSpeeds] = useState<Record<string, LineMeasure | "pending">>(() =>
+    Object.fromEntries(sources.filter((item) => item.episodes[0]).map((item) => [item.name, "pending"])),
+  );
+  const progressRef = useRef(0);
+  const durationRef = useRef(0);
+  const settled = useRef(false);
+  const current = sources.flatMap((item) => item.episodes).find((episode) => episode.playId === playId);
+
+  const remember = useCallback(
+    (nextPlayId: string, progress: number, duration: number) => {
+      const line = sources.find((item) => item.episodes.some((episode) => episode.playId === nextPlayId));
+      const episode = line?.episodes.find((item) => item.playId === nextPlayId);
+      if (!line || !episode) return;
+      progressRef.current = progress;
+      durationRef.current = duration;
+      saveProgress({
+        id,
+        title: data.vod_name,
+        cover: data.vod_pic || "",
+        line: line.name,
+        episode: episode.name,
+        playId: nextPlayId,
+        progress,
+        duration,
+      });
+    },
+    [data.vod_name, data.vod_pic, id, sources],
+  );
+
+  useEffect(() => {
+    if (settled.current) return;
+    const intent = readPlayIntent(id);
+    if (intent && (intent === playId || !playId)) {
+      settled.current = true;
+      return;
+    }
+    if (playId && !findHistory(id)) {
+      settled.current = true;
+      return;
+    }
+    const decision = chooseResume(sources, findHistory(id), speeds);
+    if (decision.status === "wait") return;
+    settled.current = true;
+    writePlayIntent(id, decision.playId);
+    if (decision.playId !== playId) {
+      beginNavigation();
+      router.replace(playHref(id, decision.playId));
+    }
+  }, [id, playId, router, sources, speeds]);
   const facts = [
     ["主演", people(data.vod_actor)],
     ["导演", people(data.vod_director)],
@@ -52,13 +102,26 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
   ].filter((item): item is [string, string] => Boolean(item[1]));
 
   function open(nextPlayId: string) {
+    if (!nextPlayId || nextPlayId === playId) return;
+    const sameEpisode = episodeIndex(playId) != null && episodeIndex(playId) === episodeIndex(nextPlayId);
+    remember(nextPlayId, sameEpisode ? progressRef.current : 0, sameEpisode ? durationRef.current : 0);
+    writePlayIntent(id, nextPlayId);
+    settled.current = true;
     beginNavigation();
     router.push(playHref(id, nextPlayId));
   }
 
+  const onProgress = useCallback(
+    (progress: number, duration: number) => {
+      if (!settled.current) return;
+      remember(playId, progress, duration);
+    },
+    [playId, remember],
+  );
+
   return (
     <div className="play-layout">
-      {playId ? <Player playId={playId} initial={source} /> : <div className="player-frame"><div className="player-mask">正在选择剧集</div></div>}
+      {playId ? <Player playId={playId} videoId={id} initial={source} onProgress={onProgress} /> : <div className="player-frame"><div className="player-mask">正在选择剧集</div></div>}
       <div className="play-sheet">
         <div className="play-detail">
           <div className="play-meta">
@@ -79,7 +142,7 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
         </div>
         <div className="play-side">
           {sources.length ? (
-            <EpisodePicker sources={sources} playId={playId} onOpen={open} />
+            <EpisodePicker sources={sources} playId={playId} speeds={speeds} onSpeeds={setSpeeds} onOpen={open} />
           ) : (
             <Status title="没有可播放的剧集" />
           )}
@@ -186,11 +249,6 @@ function textUnits(text: string) {
 
 const EPISODE_PAGE = 30;
 
-function episodeIndex(playId: string) {
-  const match = playId.match(/^ep_\d+_\d+_(\d+)$/);
-  return match ? Number(match[1]) : null;
-}
-
 function matchingEpisode(from: Episode[], to: Episode[], playId: string) {
   if (!to.length) return undefined;
   const current = from.find((episode) => episode.playId === playId);
@@ -217,7 +275,19 @@ function rangeLabel(index: number, count: number) {
   return start === end ? String(start) : `${start}-${end}`;
 }
 
-function EpisodePicker({ sources, playId, onOpen }: { sources: Source[]; playId: string; onOpen: (playId: string) => void }) {
+function EpisodePicker({
+  sources,
+  playId,
+  speeds,
+  onSpeeds,
+  onOpen,
+}: {
+  sources: Source[];
+  playId: string;
+  speeds: Record<string, LineMeasure | "pending">;
+  onSpeeds: (speeds: Record<string, LineMeasure | "pending"> | ((current: Record<string, LineMeasure | "pending">) => Record<string, LineMeasure | "pending">)) => void;
+  onOpen: (playId: string) => void;
+}) {
   const [reversed, setReversed] = useState(false);
   const active = sources.find((source) => source.episodes.some((episode) => episode.playId === playId)) || sources[0];
   const units = sources.reduce((max, source) => source.episodes.reduce((inner, episode) => Math.max(inner, textUnits(episode.name)), max), 1);
@@ -238,7 +308,7 @@ function EpisodePicker({ sources, playId, onOpen }: { sources: Source[]; playId:
       <div className="section-head">
         <h2>播放线路</h2>
       </div>
-      <LineRow sources={sources} active={active} playId={playId} onOpen={onOpen} />
+      <LineRow sources={sources} active={active} playId={playId} speeds={speeds} onSpeeds={onSpeeds} onOpen={onOpen} />
       <div className="section-head episode-head">
         <h2>选集</h2>
         <div className="episode-tools">
@@ -334,31 +404,30 @@ function lineRank(measure: LineMeasure | "pending" | undefined, best: boolean) {
   return 3;
 }
 
-function pendingSpeeds(sources: Source[]) {
-  return Object.fromEntries(
-    sources.flatMap((source) => {
-      const playId = source.episodes[0]?.playId;
-      return playId ? [[source.name, readLineMeasure(playId) || "pending"] as const] : [];
-    }),
-  );
-}
-
-function LineRow({ sources, active, playId, onOpen }: { sources: Source[]; active: Source; playId: string; onOpen: (playId: string) => void }) {
+function LineRow({
+  sources,
+  active,
+  playId,
+  speeds,
+  onSpeeds,
+  onOpen,
+}: {
+  sources: Source[];
+  active: Source;
+  playId: string;
+  speeds: Record<string, LineMeasure | "pending">;
+  onSpeeds: (speeds: Record<string, LineMeasure | "pending"> | ((current: Record<string, LineMeasure | "pending">) => Record<string, LineMeasure | "pending">)) => void;
+  onOpen: (playId: string) => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ left: false, right: false, hint: false });
   const probeKey = sources.map((source) => source.episodes[0]?.playId || "").join("|");
-  const [trackedProbe, setTrackedProbe] = useState(probeKey);
-  const [speeds, setSpeeds] = useState<Record<string, LineMeasure | "pending">>(() => pendingSpeeds(sources));
-  if (probeKey !== trackedProbe) {
-    setTrackedProbe(probeKey);
-    setSpeeds(pendingSpeeds(sources));
-  }
 
   useEffect(() => {
     let cancelled = false;
     const jobs = sources.flatMap((source) => {
-      const playId = source.episodes[0]?.playId;
-      return playId ? [{ name: source.name, playId }] : [];
+      const id = source.episodes[0]?.playId;
+      return id ? [{ name: source.name, playId: id }] : [];
     });
     let cursor = 0;
     async function worker() {
@@ -368,14 +437,14 @@ function LineRow({ sources, active, playId, onOpen }: { sources: Source[]; activ
         if (!job) return;
         const measured = await measureLine(job.playId);
         if (cancelled) return;
-        setSpeeds((current) => ({ ...current, [job.name]: measured }));
+        onSpeeds((current) => ({ ...current, [job.name]: measured }));
       }
     }
     void Promise.all([worker(), worker()]);
     return () => {
       cancelled = true;
     };
-  }, [probeKey, sources]);
+  }, [onSpeeds, probeKey, sources]);
 
   useEffect(() => {
     const node = ref.current;

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CATEGORIES } from "@/lib/catalog";
 import { channelHref, listTypeFromPath, searchHref, searchQueryFromPath } from "@/lib/paths";
+import { HistoryMenu } from "./history-menu";
 import { beginNavigation } from "./navigation-progress";
 import { IconSearch } from "./icons";
 
@@ -40,6 +41,7 @@ export function SiteHeader() {
         <button className="search-icon" type="button" aria-label="搜索" aria-expanded={open} onClick={() => setOpen(true)}>
           <IconSearch />
         </button>
+        <HistoryMenu />
         <nav className="nav" aria-label="频道">
           {LINKS.map((item) => {
             const active =
