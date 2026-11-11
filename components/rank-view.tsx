@@ -18,7 +18,7 @@ export function RankView({
       </div>
       <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {panels.map((panel) => (
-          <section className="rank-panel min-w-0 xl:col-span-2 xl:[&:nth-child(n+4)]:col-span-3" key={panel.typeId}>
+          <section className="rank-panel min-w-0 xl:col-span-2" key={panel.typeId}>
             <div className="rank-head">
               <span className="rank-top">TOP</span>
               <h2>{panel.title}</h2>
