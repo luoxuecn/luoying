@@ -186,7 +186,7 @@ export function Player({
   }, [playId, videoId, attempt, initial]);
 
   return (
-    <div className={playerFrame}>
+    <div className={playerFrame} data-player={phase}>
       <div className="art-slot" ref={slotRef} />
       {phase === "loading" ? (
         <div className="player-mask" role="status" aria-label="正在加载">

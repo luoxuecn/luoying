@@ -635,7 +635,7 @@ img { display: block; max-width: 100%; }
 .player-mask {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 80;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -644,6 +644,11 @@ img { display: block; max-width: 100%; }
   padding: 16px;
   text-align: center;
   background: rgba(7, 9, 13, 0.78);
+}
+[data-player="loading"] .art-loading,
+[data-player="error"] .art-loading,
+[data-player="switch"] .art-loading {
+  display: none !important;
 }
 .player-spin {
   width: 36px;
@@ -893,6 +898,7 @@ img { display: block; max-width: 100%; }
   .state { min-height: 200px; padding: 24px 16px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
 
 
 
