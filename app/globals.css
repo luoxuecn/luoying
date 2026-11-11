@@ -588,24 +588,6 @@ img { display: block; max-width: 100%; }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-@media (min-width: 1280px) {
-  .search-copy .search-facts {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: baseline;
-    column-gap: 14px;
-    row-gap: 4px;
-  }
-  .search-copy .search-facts div {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-    min-width: 0;
-    max-width: 100%;
-  }
-  .search-copy .search-facts div:has(dd.clamp) { flex: 1 0 100%; }
-  .search-copy .search-facts dd { min-width: 0; }
-}
 
 .play-skel {
   display: block;
@@ -856,4 +838,5 @@ img { display: block; max-width: 100%; }
   .play-copy .search-facts { flex: none; justify-content: flex-start; gap: 2px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
 
