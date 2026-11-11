@@ -505,10 +505,11 @@ function LineRow({
   ).name;
   const ordered = [...sources].sort((a, b) => lineRank(speeds[a.name], a.name === bestName) - lineRank(speeds[b.name], b.name === bestName) || byLineName(a, b));
 
+  const lineUnits = sources.reduce((max, source) => Math.max(max, textUnits(source.name)), 1);
   const reserve = [edges.left ? "reserve-prev" : "", edges.right ? "reserve-next" : ""].filter(Boolean).join(" ");
   return (
     <div className={reserve ? `line-row ${reserve}` : "line-row"}>
-      <div className="line-scroller" ref={ref}>
+      <div className="line-scroller" ref={ref} style={{ "--line-units": lineUnits } as CSSProperties}>
         {ordered.map((source) => {
           const speed = lineLabel(speeds[source.name], source.name === bestName);
           return (

@@ -701,14 +701,13 @@ img { display: block; max-width: 100%; }
 }
 .line-scroller::-webkit-scrollbar { display: none; height: 0; }
 .line-chip {
-  flex: 1 1 72px;
+  flex: 0 0 auto;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  min-width: 72px;
-  max-width: 180px;
+  width: max(calc(var(--line-units) * 1em + 28px), calc(4 * 12px + 28px));
   min-height: 52px;
   padding: 8px 10px;
   border-radius: 8px;
@@ -718,9 +717,8 @@ img { display: block; max-width: 100%; }
   white-space: nowrap;
 }
 .line-chip > span:first-child {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: none;
+  overflow: visible;
 }
 .line-chip.active { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
 .line-speed { font-size: 12px; line-height: 1.3; }
@@ -883,6 +881,7 @@ img { display: block; max-width: 100%; }
   .state { min-height: 200px; padding: 24px 16px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
 
 
 
