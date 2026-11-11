@@ -689,8 +689,6 @@ img { display: block; max-width: 100%; }
 .plot-tail { white-space: nowrap; }
 .plot-fold { margin-left: 0.45em; }
 .line-row { position: relative; }
-.line-row.reserve-prev { padding-left: 28px; }
-.line-row.reserve-next { padding-right: 28px; }
 .line-scroller {
   display: flex;
   gap: 8px;
@@ -741,9 +739,8 @@ img { display: block; max-width: 100%; }
   border: 0;
   border-radius: 999px;
   transform: translateY(-50%);
-  background: rgba(16, 20, 28, 0.82);
+  background: #10141c;
   color: var(--text);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 .line-nav.prev { left: 0; }
 .line-nav.next { right: 0; }
@@ -881,6 +878,8 @@ img { display: block; max-width: 100%; }
   .state { min-height: 200px; padding: 24px 16px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
+
 
 
 
