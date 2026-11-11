@@ -5,7 +5,7 @@ import { Children, useEffect, useRef, useState, type CSSProperties, type ReactNo
 import { listHref } from "@/lib/links";
 import type { Card } from "@/lib/parse";
 import { IconChevronLeft, IconChevronRight } from "./icons";
-import { homeStrip, posterFrame } from "@/lib/ui";
+import { homeMetrics, homeStrip, posterFrame } from "@/lib/ui";
 import { Poster, Status } from "./media";
 
 interface HomeData {
@@ -97,22 +97,22 @@ function CardRow({ children }: { children: ReactNode }) {
   const count = Math.max(Children.count(children), 1);
 
   return (
-    <div className="relative">
-      <div className={posterFrame}>
-        <div className={`${homeStrip} ${mask}`} style={{ "--home-cards": count } as CSSProperties} ref={ref}>
+    <div className={posterFrame}>
+      <div className={`relative ${homeMetrics}`} style={{ "--home-cards": count } as CSSProperties}>
+        <div className={`${homeStrip} ${mask}`} ref={ref}>
           {children}
         </div>
+        {edges.left ? (
+          <button className="home-row-nav prev" type="button" aria-label="向左查看" onClick={() => move(-1)}>
+            <IconChevronLeft />
+          </button>
+        ) : null}
+        {edges.right ? (
+          <button className="home-row-nav next" type="button" aria-label="向右查看" onClick={() => move(1)}>
+            <IconChevronRight />
+          </button>
+        ) : null}
       </div>
-      {edges.left ? (
-        <button className="home-row-nav prev" type="button" aria-label="向左查看" onClick={() => move(-1)}>
-          <IconChevronLeft />
-        </button>
-      ) : null}
-      {edges.right ? (
-        <button className="home-row-nav next" type="button" aria-label="向右查看" onClick={() => move(1)}>
-          <IconChevronRight />
-        </button>
-      ) : null}
       {edges.fadeLeft || edges.fadeRight ? <p className="mt-2 text-xs text-faint lg:hidden">左右滑动查看</p> : null}
     </div>
   );

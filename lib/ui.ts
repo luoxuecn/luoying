@@ -9,14 +9,19 @@ export const posterGrid = [
   "@min-[1120px]:grid-cols-9",
 ].join(" ");
 
-export const homeStrip = [
-  "flex snap-x snap-mandatory gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+export const homeMetrics = [
   "[--fit:3] [--gap:10px]",
-  "@min-[490px]:gap-3.5 @min-[490px]:[--fit:4] @min-[490px]:[--gap:14px]",
+  "@min-[490px]:[--fit:4] @min-[490px]:[--gap:14px]",
   "@min-[616px]:[--fit:5]",
   "@min-[742px]:[--fit:6]",
   "@min-[868px]:[--fit:7]",
   "@min-[994px]:[--fit:8]",
+].join(" ");
+
+export const homeStrip = [
+  "flex snap-x snap-mandatory gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+  homeMetrics,
+  "@min-[490px]:gap-3.5",
   "[&>.card]:shrink-0 [&>.card]:snap-start",
   "[&>.card]:w-[calc((100cqw-(min(var(--fit),var(--home-cards))-1)*var(--gap))/min(var(--fit),var(--home-cards)))]",
 ].join(" ");
