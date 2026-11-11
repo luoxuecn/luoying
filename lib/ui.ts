@@ -19,7 +19,7 @@ export const homeMetrics = [
 ].join(" ");
 
 export const homeStrip = [
-  "flex snap-x snap-mandatory gap-2.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+  "flex snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
   homeMetrics,
   "@min-[490px]:gap-3.5",
   "[&>.card]:shrink-0 [&>.card]:snap-start",
@@ -60,4 +60,4 @@ export const chipRow = "flex items-start gap-2.5 max-xl:items-center";
 export const chipLabel = "w-11 shrink-0 pt-1 text-[13px] text-faint max-xl:w-9 max-xl:pt-0";
 
 export const chipScroller =
-  "flex flex-wrap gap-1.5 max-xl:min-w-0 max-xl:flex-1 max-xl:flex-nowrap max-xl:overflow-x-auto max-xl:[scrollbar-width:none] max-xl:[&::-webkit-scrollbar]:hidden";
+  "flex flex-wrap gap-1.5 max-xl:min-w-0 max-xl:flex-1 max-xl:flex-nowrap max-xl:overflow-x-auto max-xl:overscroll-x-contain max-xl:[scrollbar-width:none] max-xl:[&::-webkit-scrollbar]:hidden";

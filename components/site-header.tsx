@@ -43,7 +43,7 @@ export function SiteHeader() {
           <IconSearch />
         </button>
         <HistoryMenu />
-        <nav className="order-4 flex min-w-0 basis-full items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:order-2 lg:basis-auto" aria-label="频道">
+        <nav className="order-4 flex min-w-0 basis-full items-center gap-0.5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:order-2 lg:basis-auto" aria-label="频道">
           {LINKS.map((item) => {
             const active =
               item.key === "rank"

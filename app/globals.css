@@ -693,6 +693,7 @@ img { display: block; max-width: 100%; }
   display: flex;
   gap: 8px;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
@@ -770,6 +771,7 @@ img { display: block; max-width: 100%; }
   align-items: center;
   gap: 20px;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;

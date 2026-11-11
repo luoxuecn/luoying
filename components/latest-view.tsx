@@ -17,7 +17,7 @@ export function LatestView({ typeId, data }: { typeId: string; data: LatestData 
       <div className={pageHead}>
         <h1 className={pageTitle}>{title}</h1>
       </div>
-      <div className="mb-4 flex flex-wrap gap-2 max-xl:flex-nowrap max-xl:overflow-x-auto max-xl:[scrollbar-width:none]">
+      <div className="mb-4 flex flex-wrap gap-2 max-xl:flex-nowrap max-xl:overflow-x-auto max-xl:overscroll-x-contain max-xl:[scrollbar-width:none]">
         <Link className={typeId ? "chip" : "chip active"} href={latestHref()}>
           全部
         </Link>

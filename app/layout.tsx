@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
+import { TrackpadPan } from "@/components/trackpad-pan";
 import { shell } from "@/lib/ui";
 import "./globals.css";
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>
+        <TrackpadPan />
         <div className="flex min-h-svh flex-col">
           <Suspense fallback={<div className="sticky top-0 z-20 h-16 border-b border-line bg-bg/92" />}>
             <SiteHeader />
