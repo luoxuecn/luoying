@@ -20,8 +20,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: 'try{if(location.pathname.startsWith("/play/"))document.documentElement.dataset.play="true"}catch(e){}',
+          }}
+        />
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>

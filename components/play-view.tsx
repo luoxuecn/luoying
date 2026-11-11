@@ -169,18 +169,24 @@ export function PlaySkeleton() {
           <span className="play-skel title" />
         </span>
         <div className={playSide}>
-          <span className="play-skel head" />
-          <div className="play-skel-lines">
-            {Array.from({ length: 3 }, (_, index) => (
-              <span className="play-skel" key={index} />
-            ))}
-          </div>
-          <span className="play-skel head" />
-          <div className="play-skel-eps">
-            {Array.from({ length: 12 }, (_, index) => (
-              <span className="play-skel" key={index} />
-            ))}
-          </div>
+          <section className={playLines}>
+            <div className="section-head">
+              <span className="play-skel head" />
+            </div>
+            <div className="play-skel-lines">
+              {Array.from({ length: 4 }, (_, index) => (
+                <span className="play-skel" key={index} />
+              ))}
+            </div>
+            <div className="section-head episode-head">
+              <span className="play-skel head" />
+            </div>
+            <div className="episodes" style={{ "--ep-units": 3 } as CSSProperties}>
+              {Array.from({ length: 12 }, (_, index) => (
+                <span className="play-skel" key={index} />
+              ))}
+            </div>
+          </section>
         </div>
       </div>
       <div className={playDetail}>

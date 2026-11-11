@@ -616,17 +616,20 @@ img { display: block; max-width: 100%; }
   animation: shine 1.2s ease-in-out infinite;
 }
 .poster.play-skel { background-color: var(--soft); }
-.play-skel.title { width: 42%; height: 22px; }
+.play-skel.title { width: 42%; height: 28px; }
 .play-copy .play-skel.fact { width: 58%; height: 14px; }
 .play-skel.plot { height: 14px; margin-top: 16px; }
 .play-skel.plot.short { width: 70%; margin-top: 8px; }
-.play-skel.head { width: 72px; height: 16px; margin-bottom: 12px; }
-.play-skel-lines,
-.play-skel-eps { display: grid; gap: 8px; }
-.play-skel-lines { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 22px; }
-.play-skel-lines .play-skel { height: 52px; border-radius: 8px; }
-.play-skel-eps { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
-.play-skel-eps .play-skel { height: 36px; border-radius: 8px; }
+.section-head .play-skel.head { width: 88px; height: 30px; margin: 0; }
+.play-skel-lines { display: flex; gap: 8px; }
+.play-skel-lines .play-skel {
+  flex: 1 1 72px;
+  min-width: 72px;
+  max-width: 180px;
+  height: 57px;
+  border-radius: 8px;
+}
+.episodes .play-skel { height: 36px; border-radius: 8px; }
 .art-slot { position: absolute; inset: 0; }
 .art-notice { display: none !important; }
 .player-mask {
@@ -866,6 +869,7 @@ img { display: block; max-width: 100%; }
   .state { min-height: 200px; padding: 24px 16px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
 
 
 
