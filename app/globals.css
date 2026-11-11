@@ -414,6 +414,7 @@ html[data-play="true"] .page { padding-top: 0; }
 .shortcuts { display: flex; gap: 8px; margin: 16px 0 8px; }
 
 .section { margin-top: 26px; }
+.home > .section:first-child { margin-top: -8px; }
 .section-head {
   display: flex;
   align-items: center;

@@ -21,7 +21,7 @@ export function HomeView({ data }: { data: HomeData }) {
   const hasCards = (showHomeBanner && data.banner.length > 0) || sections.some((section) => section.list.length > 0);
   if (!hasCards) return <Status title="暂时没有影片" />;
   return (
-    <div>
+    <div className="home">
       {showHomeBanner && data.banner.length ? <Banner items={data.banner} /> : null}
       {sections.map((section) => (
         <section className="section" key={section.title}>
