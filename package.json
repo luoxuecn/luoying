@@ -1,5 +1,9 @@
 {
-  "name": "luoxue-movie",
+  "name": "luoying",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luoxuecn/luoying.git"
+  },
   "version": "0.1.0",
   "private": true,
   "scripts": {

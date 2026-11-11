@@ -3,7 +3,7 @@
 电影、电视剧、综艺、动漫、短剧。目录由服务端访问片源站，播放器直接使用片源返回的地址。
 
 ```bash
-cd /agent/luoxue-movie
+cd /agent/luoying
 npm run dev
 ```
 
