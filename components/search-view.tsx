@@ -17,10 +17,6 @@ interface SearchData {
   list: Card[];
 }
 
-function names(value?: string) {
-  return shownFact(value?.replace(/[,，]\s*/g, " "));
-}
-
 export function SearchView({ query, data }: { query: string; data: SearchData | null }) {
   function pageHref(nextPage: number) {
     return searchHref(query, nextPage);
@@ -39,8 +35,6 @@ export function SearchView({ query, data }: { query: string; data: SearchData | 
           <div className="search-list flex flex-col gap-4 xl:grid xl:grid-cols-2 xl:gap-x-7 xl:gap-y-2">
             {data.list.map((card) => {
               const facts = [
-                ["主演", names(card.vod_actor)],
-                ["导演", names(card.vod_director)],
                 ["地区", shownFact(card.vod_area)],
                 ["类型", shownFact(card.type_name)],
                 ["语言", shownFact(card.vod_lang)],
@@ -57,7 +51,7 @@ export function SearchView({ query, data }: { query: string; data: SearchData | 
                         {facts.map(([label, value]) => (
                           <div key={label}>
                             <dt>{label}：</dt>
-                            <dd className={label === "主演" ? "clamp" : undefined}>{value}</dd>
+                            <dd>{value}</dd>
                           </div>
                         ))}
                       </dl>
