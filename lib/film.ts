@@ -9,7 +9,6 @@ import {
 } from "./catalog";
 import { invalid } from "./errors";
 import { moviePath, playPath } from "./ids";
-import { playbackPath } from "./media-proxy";
 import { parseChannel, parseDetail, parseHome, parseLatest, parsePlay, parseRss, parseSearch, parseVideoList, type Section } from "./parse";
 import { UPSTREAM_UA, upstreamText } from "./upstream";
 
@@ -141,7 +140,7 @@ export async function getPlay(params: URLSearchParams) {
   if (!parsed.media) {
     return { parse: 1, url: "", urls: [], header: {} };
   }
-  const url = playbackPath(parsed.url);
+  const url = parsed.url;
   return {
     parse: 0,
     url,
