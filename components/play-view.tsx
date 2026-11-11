@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { findHistory, readPlayIntent, saveProgress, writePlayIntent } from "@/lib/history";
+import { shownFact } from "@/lib/display";
 import { playHref } from "@/lib/paths";
 import { beginNavigation } from "./navigation-progress";
 import { IconChevronLeft, IconChevronRight, IconSortDown, IconSortUp } from "./icons";
@@ -90,15 +91,16 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
       router.replace(playHref(id, decision.playId));
     }
   }, [id, playId, router, sources, speeds]);
+  const title = current ? `${data.vod_name} · ${current.name}` : data.vod_name;
   const facts = [
-    ["主演", people(data.vod_actor)],
-    ["导演", people(data.vod_director)],
-    ["地区", data.vod_area || ""],
-    ["类型", data.type_name || ""],
-    ["语言", data.vod_lang || ""],
-    ["年份", data.vod_year || ""],
-    ["豆瓣", data.vod_douban_score && !data.vod_douban_score.includes("暂无") ? data.vod_douban_score : ""],
-    ["又名", people(data.other)],
+    ["主演", shownFact(people(data.vod_actor))],
+    ["导演", shownFact(people(data.vod_director))],
+    ["地区", shownFact(data.vod_area)],
+    ["类型", shownFact(data.type_name)],
+    ["语言", shownFact(data.vod_lang)],
+    ["年份", shownFact(data.vod_year)],
+    ["豆瓣", shownFact(data.vod_douban_score)],
+    ["又名", shownFact(people(data.other))],
   ].filter((item): item is [string, string] => Boolean(item[1]));
 
   function open(nextPlayId: string) {
@@ -121,25 +123,9 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
 
   return (
     <div className="play-layout">
-      {playId ? <Player playId={playId} videoId={id} initial={source} onProgress={onProgress} /> : <div className="player-frame"><div className="player-mask">正在选择剧集</div></div>}
-      <div className="play-sheet">
-        <div className="play-detail">
-          <div className="play-meta">
-            <PosterFace card={data} />
-            <div className="play-copy">
-              <h1>{current ? `${data.vod_name} · ${current.name}` : data.vod_name}</h1>
-              <dl className="search-facts">
-                {facts.map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}：</dt>
-                    <dd className={label === "主演" ? "clamp" : undefined}>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </div>
-          {data.vod_content ? <Plot text={data.vod_content} /> : null}
-        </div>
+      <div className="play-stage">
+        {playId ? <Player playId={playId} videoId={id} initial={source} onProgress={onProgress} /> : <div className="player-frame"><div className="player-mask">正在选择剧集</div></div>}
+        <h1 className="play-title">{title}</h1>
         <div className="play-side">
           {sources.length ? (
             <EpisodePicker sources={sources} playId={playId} speeds={speeds} onSpeeds={setSpeeds} onOpen={open} />
@@ -148,6 +134,22 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
           )}
         </div>
       </div>
+      <div className="play-detail">
+        <div className="play-meta">
+          <PosterFace card={data} />
+          <div className="play-copy">
+            <dl className="search-facts">
+              {facts.map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}：</dt>
+                  <dd className={label === "主演" ? "clamp" : undefined}>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+        {data.vod_content ? <Plot text={data.vod_content} /> : null}
+      </div>
     </div>
   );
 }
@@ -155,21 +157,11 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
 export function PlaySkeleton() {
   return (
     <div className="play-layout" aria-busy="true" aria-label="正在加载影片">
-      <div className="player-frame" />
-      <div className="play-sheet">
-        <div className="play-detail">
-          <div className="play-meta">
-            <div className="poster play-skel" />
-            <div className="play-copy">
-              <span className="play-skel title" />
-              {Array.from({ length: 6 }, (_, index) => (
-                <span className="play-skel fact" key={index} />
-              ))}
-            </div>
-          </div>
-          <span className="play-skel plot" />
-          <span className="play-skel plot short" />
-        </div>
+      <div className="play-stage">
+        <div className="player-frame" />
+        <span className="play-title">
+          <span className="play-skel title" />
+        </span>
         <div className="play-side">
           <span className="play-skel head" />
           <div className="play-skel-lines">
@@ -184,6 +176,18 @@ export function PlaySkeleton() {
             ))}
           </div>
         </div>
+      </div>
+      <div className="play-detail">
+        <div className="play-meta">
+          <div className="poster play-skel" />
+          <div className="play-copy">
+            {Array.from({ length: 6 }, (_, index) => (
+              <span className="play-skel fact" key={index} />
+            ))}
+          </div>
+        </div>
+        <span className="play-skel plot" />
+        <span className="play-skel plot short" />
       </div>
     </div>
   );
@@ -366,10 +370,11 @@ function PageRow({ pages, current, onPick }: { pages: Episode[][]; current: numb
     node.scrollBy({ left: direction * Math.max(node.clientWidth * 0.6, 140), behavior: "smooth" });
   }
 
+  const reserve = [edges.left ? "reserve-prev" : "", edges.right ? "reserve-next" : ""].filter(Boolean).join(" ");
   const fade = [edges.left ? "fade-left" : "", edges.right ? "fade-right" : ""].filter(Boolean).join(" ");
   return (
     <div className="episode-pages">
-      <div className={fade ? `episode-page-row ${fade}` : "episode-page-row"}>
+      <div className={["episode-page-row", fade, reserve].filter(Boolean).join(" ")}>
         <div className="episode-page-scroller" ref={ref} role="tablist" aria-label="选集分页">
           {pages.map((list, index) => (
             <button className={index === current ? "episode-page on" : "episode-page"} type="button" role="tab" aria-selected={index === current} key={list[0]?.playId || index} onClick={() => onPick(index)}>
@@ -488,8 +493,9 @@ function LineRow({
   ).name;
   const ordered = [...sources].sort((a, b) => lineRank(speeds[a.name], a.name === bestName) - lineRank(speeds[b.name], b.name === bestName) || byLineName(a, b));
 
+  const reserve = [edges.left ? "reserve-prev" : "", edges.right ? "reserve-next" : ""].filter(Boolean).join(" ");
   return (
-    <div className="line-row">
+    <div className={reserve ? `line-row ${reserve}` : "line-row"}>
       <div className="line-scroller" ref={ref}>
         {ordered.map((source) => {
           const speed = lineLabel(speeds[source.name], source.name === bestName);

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { shownFact } from "@/lib/display";
 import type { Card } from "@/lib/parse";
 import { searchHref } from "@/lib/paths";
 import { Pager, PosterFace, Status } from "./media";
@@ -16,7 +17,11 @@ interface SearchData {
 }
 
 function names(value?: string) {
-  return value?.replace(/[,，]\s*/g, " ").replace(/\s+/g, " ").trim() || "";
+  return shownFact(value?.replace(/[,，]\s*/g, " "));
+}
+
+function summaryLine(card: Card) {
+  return [shownFact(card.vod_year), shownFact(card.vod_area), shownFact(card.type_name), names(card.vod_actor)].filter(Boolean).join(" · ");
 }
 
 export function SearchView({ query, data }: { query: string; data: SearchData | null }) {
@@ -39,17 +44,19 @@ export function SearchView({ query, data }: { query: string; data: SearchData | 
               const facts = [
                 ["主演", names(card.vod_actor)],
                 ["导演", names(card.vod_director)],
-                ["地区", card.vod_area || ""],
-                ["类型", card.type_name || ""],
-                ["语言", card.vod_lang || ""],
-                ["年份", card.vod_year || ""],
-                ["豆瓣", card.vod_douban_score && !card.vod_douban_score.includes("暂无") ? card.vod_douban_score : ""],
+                ["地区", shownFact(card.vod_area)],
+                ["类型", shownFact(card.type_name)],
+                ["语言", shownFact(card.vod_lang)],
+                ["年份", shownFact(card.vod_year)],
+                ["豆瓣", shownFact(card.vod_douban_score)],
               ].filter((item): item is [string, string] => Boolean(item[1]));
+              const summary = summaryLine(card);
               return (
                 <Link className="search-row" href={`/play/${card.id}`} key={card.id}>
                   <PosterFace card={card} />
                   <div className="search-copy">
                     <h2>{card.vod_name}</h2>
+                    {summary ? <p className="search-summary">{summary}</p> : null}
                     <dl className="search-facts">
                       {facts.map(([label, value]) => (
                         <div key={label}>

@@ -33,7 +33,7 @@ function writeLineMeasure(playId: string, measure: LineMeasure) {
 
 function absoluteUrl(value: string, base: string) {
   try {
-    return new URL(value, base).toString();
+    return new URL(value, new URL(base, location.href)).toString();
   } catch {
     return "";
   }

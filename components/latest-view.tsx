@@ -18,6 +18,9 @@ export function LatestView({ typeId, data }: { typeId: string; data: LatestData 
         <h1>{title}</h1>
       </div>
       <div className="pills">
+        <Link className={typeId ? "chip" : "chip active"} href={latestHref()}>
+          全部
+        </Link>
         {CATEGORIES.map((item) => (
           <Link className={item.type_id === typeId ? "chip active" : "chip"} href={latestHref(item.type_id)} key={item.type_id}>
             {item.type_name}
