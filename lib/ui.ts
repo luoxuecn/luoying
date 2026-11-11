@@ -44,7 +44,7 @@ export const playTitle = [
 ].join(" ");
 
 export const playSide =
-  "order-4 min-[1101px]:col-start-2 min-[1101px]:row-start-2 min-[1101px]:min-h-0 min-[1101px]:min-w-0 min-[1101px]:overflow-auto min-[1101px]:border-l min-[1101px]:border-line min-[1101px]:bg-[#0c1017] min-[1101px]:px-4 min-[1101px]:pt-0 min-[1101px]:pb-5";
+  "order-4 min-[1101px]:col-start-2 min-[1101px]:row-start-2 min-[1101px]:min-h-0 min-[1101px]:min-w-0 min-[1101px]:overflow-auto min-[1101px]:border-l min-[1101px]:border-line min-[1101px]:bg-[#0c1017] min-[1101px]:px-4 min-[1101px]:pt-0 min-[1101px]:pb-5 local-scroll";
 
 export const playDetail = "order-3 min-[1101px]:mx-auto min-[1101px]:w-[min(1840px,calc(100%-40px))]";
 

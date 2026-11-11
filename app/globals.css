@@ -586,6 +586,28 @@ img { display: block; max-width: 100%; }
   overflow: hidden;
 }
 
+.local-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #6d778b transparent;
+}
+.local-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.local-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.local-scroll::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #6d778b;
+  background-clip: padding-box;
+}
+.local-scroll::-webkit-scrollbar-thumb:hover {
+  background: #e4b15a;
+  background-clip: padding-box;
+}
+
 .play-skel {
   display: block;
   border-radius: 6px;
@@ -834,6 +856,7 @@ img { display: block; max-width: 100%; }
   .state { min-height: 200px; padding: 24px 16px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
 
 
 
