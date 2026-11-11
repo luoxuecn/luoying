@@ -324,7 +324,7 @@ function EpisodePicker({
         </div>
       </div>
       {pageCount > 1 ? <PageRow pages={pages} current={current} onPick={setPage} /> : null}
-      <EpisodeGrid episodes={visible} playId={playId} units={units} onOpen={onOpen} />
+      <EpisodeGrid key={current} episodes={visible} playId={playId} units={units} onOpen={onOpen} />
     </section>
   );
 }
@@ -554,8 +554,20 @@ function EpisodeGrid({ episodes, playId, units, onOpen }: { episodes: Episode[];
     };
   }, [units]);
 
+  const episodeKey = episodes.map((episode) => episode.playId).join("|");
+  useEffect(() => {
+    const node = ref.current;
+    const active = node?.querySelector<HTMLElement>(".episode.active");
+    if (!node || !active) return;
+    const top = active.getBoundingClientRect().top - node.getBoundingClientRect().top + node.scrollTop;
+    const bottom = top + active.offsetHeight;
+    if (top < node.scrollTop || bottom > node.scrollTop + node.clientHeight) {
+      node.scrollTop = Math.max(0, top - 8);
+    }
+  }, [playId, episodeKey]);
+
   return (
-    <div className={full ? "episodes stack" : "episodes"} ref={ref} style={{ "--ep-units": units } as CSSProperties}>
+    <div className={full ? "episodes stack local-scroll" : "episodes local-scroll"} ref={ref} style={{ "--ep-units": units } as CSSProperties}>
       {episodes.map((episode) => (
         <button className={episode.playId === playId ? "episode active" : "episode"} type="button" key={episode.playId} onClick={() => onOpen(episode.playId)}>
           {episode.name}
