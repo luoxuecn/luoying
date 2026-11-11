@@ -96,7 +96,7 @@ function CardRow({ children }: { children: ReactNode }) {
 
   return (
     <div className="relative">
-      <div className={`flex snap-x snap-mandatory gap-3.5 overflow-x-auto [container-type:inline-size] [scrollbar-width:none] lg:[container-type:normal] ${mask} [&::-webkit-scrollbar]:hidden [&>.card]:w-[calc((100cqi-2*14px)/2.5)] [&>.card]:shrink-0 [&>.card]:snap-start sm:[&>.card]:w-[calc((100cqi-3*14px)/3.5)] md:[&>.card]:w-[calc((100cqi-4*14px)/4.5)] lg:[&>.card]:w-[148px]`} ref={ref}>
+      <div className={`flex snap-x snap-mandatory gap-3.5 overflow-x-auto [container-type:inline-size] [scrollbar-width:none] lg:[container-type:normal] ${mask} [&::-webkit-scrollbar]:hidden [&>.card]:w-[calc((100cqi-2*14px)/2.5)] [&>.card]:shrink-0 [&>.card]:snap-start sm:[&>.card]:w-[calc((100cqi-4*14px)/4.5)] md:[&>.card]:w-[calc((100cqi-5*14px)/6)] md:[&>.card]:max-w-[148px] lg:[&>.card]:w-[148px] lg:[&>.card]:max-w-none`} ref={ref}>
         {children}
       </div>
       {edges.left ? (
