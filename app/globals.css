@@ -689,16 +689,25 @@ img { display: block; max-width: 100%; }
 .plot-tail { white-space: nowrap; }
 .plot-fold { margin-left: 0.45em; }
 .line-row { position: relative; }
+.h-pan::-webkit-scrollbar,
+.line-scroller::-webkit-scrollbar,
+.episode-page-scroller::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+@supports not selector(::-webkit-scrollbar) {
+  .h-pan,
+  .line-scroller,
+  .episode-page-scroller { scrollbar-width: none; }
+}
 .line-scroller {
   display: flex;
   gap: 8px;
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
 }
-.line-scroller::-webkit-scrollbar { display: none; height: 0; }
 .line-chip {
   flex: 0 0 auto;
   display: inline-flex;
@@ -771,12 +780,10 @@ img { display: block; max-width: 100%; }
   align-items: center;
   gap: 20px;
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
 }
-.episode-page-scroller::-webkit-scrollbar { display: none; height: 0; }
 .episode-page-row.fade-left .episode-page-scroller { mask-image: linear-gradient(to right, transparent, #000 28px); }
 .episode-page-row.fade-right .episode-page-scroller { mask-image: linear-gradient(to left, transparent, #000 28px); }
 .episode-page-row.fade-left.fade-right .episode-page-scroller {
@@ -886,6 +893,7 @@ img { display: block; max-width: 100%; }
   .state { min-height: 200px; padding: 24px 16px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
 
 
 

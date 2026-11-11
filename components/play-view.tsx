@@ -387,7 +387,7 @@ function PageRow({ pages, current, onPick }: { pages: Episode[][]; current: numb
   return (
     <div className="episode-pages">
       <div className={["episode-page-row", fade, reserve].filter(Boolean).join(" ")}>
-        <div className="episode-page-scroller" ref={ref} role="tablist" aria-label="选集分页">
+        <div className="episode-page-scroller h-pan" ref={ref} role="tablist" aria-label="选集分页">
           {pages.map((list, index) => (
             <button className={index === current ? "episode-page on" : "episode-page"} type="button" role="tab" aria-selected={index === current} key={list[0]?.playId || index} onClick={() => onPick(index)}>
               {rangeLabel(index, list.length)}
@@ -508,7 +508,7 @@ function LineRow({
   const lineUnits = sources.reduce((max, source) => Math.max(max, textUnits(source.name)), 1);
   return (
     <div className="line-row">
-      <div className="line-scroller" ref={ref} style={{ "--line-units": lineUnits } as CSSProperties}>
+      <div className="line-scroller h-pan" ref={ref} style={{ "--line-units": lineUnits } as CSSProperties}>
         {ordered.map((source) => {
           const speed = lineLabel(speeds[source.name], source.name === bestName);
           return (
