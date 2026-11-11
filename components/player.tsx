@@ -13,6 +13,16 @@ export interface PlayReady {
   url: string;
 }
 
+export function PlayerWait() {
+  return (
+    <div className={playerFrame}>
+      <div className="player-mask" role="status" aria-label="正在加载">
+        <span className="player-spin" />
+      </div>
+    </div>
+  );
+}
+
 export function Player({
   playId,
   videoId,
@@ -178,7 +188,11 @@ export function Player({
   return (
     <div className={playerFrame}>
       <div className="art-slot" ref={slotRef} />
-      {phase === "loading" ? <div className="player-mask">正在取播放地址</div> : null}
+      {phase === "loading" ? (
+        <div className="player-mask" role="status" aria-label="正在加载">
+          <span className="player-spin" />
+        </div>
+      ) : null}
       {phase === "switch" ? <div className="player-mask">这条线路没有可播放的地址，换一条线路试试</div> : null}
       {phase === "error" ? (
         <div className="player-mask">

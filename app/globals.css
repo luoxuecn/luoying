@@ -645,6 +645,20 @@ img { display: block; max-width: 100%; }
   text-align: center;
   background: rgba(7, 9, 13, 0.78);
 }
+.player-spin {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(228, 177, 90, 0.22);
+  border-top-color: #e4b15a;
+  border-radius: 999px;
+  animation: player-spin 0.75s linear infinite;
+}
+@keyframes player-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .player-spin { animation: none; }
+}
 
 .play-meta .badge.score { display: none; }
 .play-copy { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding-top: 2px; }
@@ -869,6 +883,7 @@ img { display: block; max-width: 100%; }
   .state { min-height: 200px; padding: 24px 16px; }
   .banner { aspect-ratio: 16 / 10; }
 }
+
 
 
 

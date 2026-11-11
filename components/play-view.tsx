@@ -9,7 +9,7 @@ import { playDetail, playLayout, playLines, playSide, playStage, playTitle, play
 import { beginNavigation } from "./navigation-progress";
 import { IconChevronLeft, IconChevronRight, IconSortDown, IconSortUp } from "./icons";
 import { lineScore, measureLine, type LineMeasure } from "./line-speed";
-import { Player, type PlayReady } from "./player";
+import { Player, PlayerWait, type PlayReady } from "./player";
 import { chooseResume, episodeIndex } from "./resume";
 import { PosterFace, Status } from "./media";
 
@@ -130,7 +130,7 @@ export function PlayView({ id, playId, data, source }: { id: string; playId: str
   return (
     <div className={playLayout}>
       <div className={playStage}>
-        {playId ? <Player playId={playId} videoId={id} initial={source} onProgress={onProgress} /> : <div className={playerFrame}><div className="player-mask">正在选择剧集</div></div>}
+        {playId ? <Player playId={playId} videoId={id} initial={source} onProgress={onProgress} /> : <PlayerWait />}
         <h1 className={playTitle}>{title}</h1>
         <div className={playSide}>
           {sources.length ? (
@@ -164,7 +164,7 @@ export function PlaySkeleton() {
   return (
     <div className={playLayout} aria-busy="true" aria-label="正在加载影片">
       <div className={playStage}>
-        <div className={playerFrame} />
+        <PlayerWait />
         <span className={playTitle}>
           <span className="play-skel title" />
         </span>
